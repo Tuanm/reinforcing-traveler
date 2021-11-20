@@ -5,14 +5,14 @@ import { RandomPolicy, ValueIterationPolicy } from './reinforcement/impl/policie
 function start() {
     const width = 6;
     const height = 6;
-    const goalState = new GridState({ x: width - 1, y: height - 1 });
+    const goalState = new GridState(width - 1, height - 1);
     const gridWorld = new GridWorld(width, height, goalState);
     const randomPolicy = new RandomPolicy(gridWorld);
     const valueIterationPolicy = new ValueIterationPolicy(gridWorld, 0.9);
-    const initialState = new GridState({ x: 0, y: 0 });
+    const initialState = new GridState(0, 0);
     const agent = new Agent(gridWorld, randomPolicy, initialState);
-    agent.setLimit(50);
-    const episodes = 5000;
+    const episodes = 5000; // number of episodes to run
+    agent.setLimit(50); // set the limit of the number of steps
     let bestResult = null;
     for (let episode = 0; episode < episodes; episode++) {
         agent.reset(initialState);
@@ -21,6 +21,7 @@ function start() {
             bestResult = result;
         }
     }
+    console.log(gridWorld.rewards);
     console.log(initialState);
     console.log(goalState);
     console.log(bestResult);

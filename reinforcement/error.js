@@ -1,14 +1,14 @@
 class NotImplementedError extends Error {
-    constructor(message) {
+    constructor(source, message) {
         super(message);
-        this.name = 'NotImplementedError';
+        this.source = source;
     }
 }
 
 class UnknownValueError extends Error {
-    constructor(message) {
+    constructor(value, message) {
         super(message);
-        this.name = 'UnknownValueError';
+        this.value = value;
     }
 };
 

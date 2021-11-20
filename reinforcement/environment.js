@@ -20,6 +20,6 @@ export default class Environment {
     }
 
     response(state, action) {
-        throw new NotImplementedError();
+        throw new NotImplementedError(this.response);
     }
 };
