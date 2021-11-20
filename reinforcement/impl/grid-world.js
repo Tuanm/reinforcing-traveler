@@ -1,4 +1,4 @@
-import { Environment, Action, Policy, State } from '../base';
+import { Environment, Action, State } from '../base';
 import { UnknownValueError } from '../error';
 
 class GridState extends State {
@@ -7,7 +7,8 @@ class GridState extends State {
     }
 
     equals(other) {
-        return this.value.x === other.value.x && this.value.y === other.value.y;
+        return this.value.x === other.value.x
+            && this.value.y === other.value.y;
     }
 }
 
@@ -77,18 +78,7 @@ class GridWorld extends Environment {
     }
 }
 
-class NaivePolicy extends Policy {
-    constructor(actions) {
-        super(actions);
-    }
-
-    dicide(state, action) {
-        return this.actions[Math.floor(Math.random() * this.actions.length)];
-    }
-}
-
 export {
     GridWorld,
-    GridState,
-    NaivePolicy
+    GridState
 };

@@ -6,6 +6,10 @@ export default class Agent {
         this.totalReward = 0;
     }
 
+    follow(policy) {
+        this.policy = policy;
+    }
+
     act(action) {
         const response = this.environment.response(this.state, action);
         this.state = response.nextState;
@@ -13,7 +17,7 @@ export default class Agent {
         this.totalReward += reward;
     }
 
-    nextAction(action) {
+    next(action) {
         return this.policy.dicide(this.state, action);
     }
 
@@ -24,12 +28,13 @@ export default class Agent {
 
     run(goalState, logger) {
         const actions = [];
+        let action = this.next();
         while (true) {
-            const action = this.nextAction();
             this.act(action);
             if (logger) logger(this);
             actions.push(action);
             if (this.state.equals(goalState)) break;
+            action = this.next(action);
         }
         return {
             actions: actions,
