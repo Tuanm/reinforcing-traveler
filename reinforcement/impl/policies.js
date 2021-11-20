@@ -1,16 +1,16 @@
 import { Policy } from '../base';
-import { GridWorld, GridState } from './grid-world';
+import { GridWorld, GridState, GridAction } from './grid-world';
 
 const createRandomDicision = (gridWorld) => (state, action, reward) => {
     const possibleActions = gridWorld.actions.filter(action => true); // copy
     if (state.x === 0)
-        possibleActions.splice(possibleActions.indexOf(GridWorld.UP), 1);
+        possibleActions.splice(possibleActions.indexOf(GridAction.UP), 1);
     if (state.x === gridWorld.height - 1)
-        possibleActions.splice(possibleActions.indexOf(GridWorld.DOWN), 1);
+        possibleActions.splice(possibleActions.indexOf(GridAction.DOWN), 1);
     if (state.y === 0)
-        possibleActions.splice(possibleActions.indexOf(GridWorld.LEFT), 1);
+        possibleActions.splice(possibleActions.indexOf(GridAction.LEFT), 1);
     if (state.y === gridWorld.width - 1)
-        possibleActions.splice(possibleActions.indexOf(GridWorld.RIGHT), 1);
+        possibleActions.splice(possibleActions.indexOf(GridAction.RIGHT), 1);
     return possibleActions[Math.floor(Math.random() * possibleActions.length)];
 };
 
@@ -72,12 +72,12 @@ class ValueIterationPolicy extends Policy {
                 });
                 // choose action for max state
                 if (maxState.x === state.x) {
-                    if (maxState.y > state.y) return GridWorld.RIGHT;
-                    if (maxState.y < state.y) return GridWorld.LEFT;
+                    if (maxState.y > state.y) return GridAction.RIGHT;
+                    if (maxState.y < state.y) return GridAction.LEFT;
                 }
                 if (maxState.y === state.y) {
-                    if (maxState.x > state.x) return GridWorld.DOWN;
-                    if (maxState.x < state.x) return GridWorld.UP;
+                    if (maxState.x > state.x) return GridAction.DOWN;
+                    if (maxState.x < state.x) return GridAction.UP;
                 }
             }
             return randomDicision(state, action, reward);

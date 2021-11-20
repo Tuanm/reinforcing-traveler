@@ -13,12 +13,14 @@ class GridState  {
     }
 }
 
-class GridWorld extends Environment {
+class GridAction {
     static UP = 'UP';
     static DOWN = 'DOWN';
     static LEFT = 'LEFT';
     static RIGHT = 'RIGHT';
+}
 
+class GridWorld extends Environment {
     constructor(width, height, goalState) {
         super();
         this.width = width;
@@ -26,10 +28,10 @@ class GridWorld extends Environment {
         this.initializeStates(goalState);
         this.initializeRewards();
         this.setActions([
-            GridWorld.UP,
-            GridWorld.DOWN,
-            GridWorld.LEFT,
-            GridWorld.RIGHT
+            GridAction.UP,
+            GridAction.DOWN,
+            GridAction.LEFT,
+            GridAction.RIGHT
         ]);
     }
 
@@ -69,16 +71,16 @@ class GridWorld extends Environment {
         const x = state.x;
         const y = state.y;
         switch (action) {
-            case GridWorld.LEFT:
+            case GridAction.LEFT:
                 if (y > 0) return new GridState(x, y - 1);
                 break;
-            case GridWorld.RIGHT:
+            case GridAction.RIGHT:
                 if (y < this.width - 1) return new GridState(x, y + 1);
                 break;
-            case GridWorld.UP:
+            case GridAction.UP:
                 if (x > 0) return new GridState(x - 1, y);
                 break;
-            case GridWorld.DOWN:
+            case GridAction.DOWN:
                 if (x < this.height - 1) return new GridState(x + 1, y);
                 break;
             default:
@@ -102,5 +104,6 @@ class GridWorld extends Environment {
 
 export {
     GridWorld,
-    GridState
+    GridState,
+    GridAction
 };
