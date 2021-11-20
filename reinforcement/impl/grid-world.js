@@ -22,8 +22,8 @@ class GridWorld extends Environment {
         super();
         this.width = width;
         this.height = height;
-        this.goalState = goalState;
-        this.initializeStates();
+        this.initializeStates(goalState);
+        this.initializeRewards();
         this.setActions([
             GridWorld.UP,
             GridWorld.DOWN,
@@ -32,25 +32,38 @@ class GridWorld extends Environment {
         ]);
     }
 
-    initializeStates() {
+    initializeStates(goalState) {
         this.states = [];
         for (let x = 0; x < this.width; x++) {
             for (let y = 0; y < this.height; y++) {
                 this.states.push(new GridState({ x, y }));
             }
         }
+        this.goalState = this.states.find(state => state.equals(goalState));
+    }
+
+    initializeRewards() {
+        this.rewards = [];
+        for (const state of this.states) {
+            this.rewards.push({
+                state: state,
+                reward: -1
+            })
+        }
+        const goalIndex = this.states.findIndex(state => state.equals(this.goalState));
+        if (goalIndex !== -1) this.rewards[goalIndex].reward = 25;
     }
 
     response(state, action) {
-        const newState = this.nextState(state, action);
-        const reward = this.reward(newState);
+        const newState = this.getNextState(state, action);
+        const reward = this.getReward(newState);
         return {
             nextState: newState,
             reward: reward
         };
     }
 
-    nextState(state, action) {
+    getNextState(state, action) {
         const x = state.value.x;
         const y = state.value.y;
         switch (action) {
@@ -72,9 +85,16 @@ class GridWorld extends Environment {
         return state;
     }
 
-    reward(newState) {
-        if (newState.equals(this.goalState)) return 25;
-        return -1;
+    getReward(newState) {
+        const state = this.states.find(state => state.equals(newState));
+        return this.rewards.find(reward => reward.state.equals(state)).reward;
+    }
+
+    getProbability(nextState, nextReward, currentState, currentAction) {
+        const state = this.getNextState(currentState, currentAction);
+        const reward = this.getReward(currentState);
+        if (state.equals(nextState) && reward === nextReward) return 1;
+        return 0;
     }
 }
 
