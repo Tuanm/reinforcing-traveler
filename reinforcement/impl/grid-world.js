@@ -94,10 +94,11 @@ class GridWorld extends Environment {
         return this.rewards.find(reward => reward.state.equals(state)).reward;
     }
 
-    getProbability(nextState, nextReward, currentState, currentAction) {
+    getProbability(currentState, currentAction, nextState, nextReward) {
         const state = this.getNextState(currentState, currentAction);
         const reward = this.getReward(currentState);
-        if (state.equals(nextState) && reward === nextReward) return 1;
+        if (state.equals(nextState)
+            && (!nextReward || (reward === nextReward))) return 1;
         return 0;
     }
 }

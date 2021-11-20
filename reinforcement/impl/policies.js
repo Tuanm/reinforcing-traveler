@@ -21,7 +21,7 @@ class RandomPolicy extends Policy {
 }
 
 class ValueIterationPolicy extends Policy {
-    constructor(gridWorld, gamma) {
+    constructor(gridWorld, config) {
         super();
         const initializeValues = () => {
             const values = [];
@@ -34,29 +34,26 @@ class ValueIterationPolicy extends Policy {
             return values;
         };
         this.update({
-            gamma: gamma,
+            discount: config.discount,
             values: initializeValues()
         });
         const randomDicision = createRandomDicision(gridWorld);
-        this.setDicision((state, action, reward) => { // TODO: it doesn't work
+        this.setDicision((state, action, reward) => {
             if (reward) {
-                const values = policy.config.values;
-                const lastValue = values[state.x][state.y];
-                const newValue = reward + policy.config.gamma * lastValue;
-                values[state.x][state.y] = newValue;
+                const values = this.config.values;
                 const possibleStates = [];
-                if (state.x > 0) possibleStates.push(new GridState({
-                    x: state.x - 1, y: state.y
-                }));
-                if (state.x < height - 1) possibleStates.push(new GridState({
-                    x: state.x + 1, y: state.y
-                }));
-                if (state.y > 0) possibleStates.push(new GridState({
-                    x: state.x, y: state.y - 1
-                }));
-                if (state.y < width - 1) possibleStates.push(new GridState({
-                    x: state.x, y: state.y + 1
-                }));
+                if (state.x > 0) possibleStates.push(new GridState(
+                    state.x - 1, state.y
+                ));
+                if (state.x < gridWorld.height - 1) possibleStates.push(new GridState(
+                    state.x + 1, state.y
+                ));
+                if (state.y > 0) possibleStates.push(new GridState(
+                    state.x, state.y - 1
+                ));
+                if (state.y < gridWorld.width - 1) possibleStates.push(new GridState(
+                    state.x, state.y + 1
+                ));
                 const maxValue = Math.max(...possibleStates.map(state => {
                     return values[state.x][state.y];
                 }));
@@ -65,11 +62,6 @@ class ValueIterationPolicy extends Policy {
                     return values[state.x][state.y] === maxValue;
                 });
                 const maxState = maxStates[Math.floor(Math.random() * maxStates.length)];
-                // update policy
-                policy.update({
-                    gamma: policy.config.gamma,
-                    values: values
-                });
                 // choose action for max state
                 if (maxState.x === state.x) {
                     if (maxState.y > state.y) return GridAction.RIGHT;
@@ -82,6 +74,40 @@ class ValueIterationPolicy extends Policy {
             }
             return randomDicision(state, action, reward);
         });
+    }
+
+    improve(gridWorld, config) {
+        const iterations = config.iterations;
+        const epsilon = config.epsilon;
+        const states = gridWorld.states;
+        const actions = gridWorld.actions;
+        const values = this.config.values;
+        let iteration = 0;
+        while (true) {
+            const lastValues = values;
+            for (const state of states) {
+                let maxValue = null; // find max action-state value
+                for (const action of actions) {
+                    for (const nextState of states) {
+                        const currentValue = gridWorld.getProbability(state, action, nextState)
+                            * values[nextState.x][nextState.y];
+                        if (maxValue === null || currentValue > maxValue) {
+                            maxValue = currentValue;
+                        }
+                    }
+                }
+                const newValue = gridWorld.getReward(state)
+                    + this.config.discount * maxValue;
+                values[state.x][state.y] = newValue;
+            }
+            if (iterations !== null && ++iteration === iterations) break;
+        }
+        // update policy
+        this.update({
+            gamma: this.config.gamma,
+            values: values
+        });
+        return this;
     }
 }
 

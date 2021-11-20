@@ -17,4 +17,8 @@ export default class Policy {
         if (this.dicision) return this.dicision(state, action, reward);
         throw new NotImplementedError(this.dicide);
     }
+
+    save(path) {
+        throw new NotImplementedError(this.save);
+    }
 };
