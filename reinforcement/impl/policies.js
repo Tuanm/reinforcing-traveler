@@ -1,19 +1,26 @@
 import { GridWorld, GridState } from './grid-world';
 import { Policy } from '../base';
 
+const createRandomDicision = (gridWorld) => (state, action, reward) => {
+    const possibleActions = gridWorld.actions.filter(action => true); // copy
+    if (state.value.x === 0) possibleActions.splice(possibleActions.indexOf(GridWorld.UP), 1);
+    if (state.value.x === gridWorld.height - 1) possibleActions.splice(possibleActions.indexOf(GridWorld.DOWN), 1);
+    if (state.value.y === 0) possibleActions.splice(possibleActions.indexOf(GridWorld.LEFT), 1);
+    if (state.value.y === gridWorld.width - 1) possibleActions.splice(possibleActions.indexOf(GridWorld.RIGHT), 1);
+    return possibleActions[Math.floor(Math.random() * possibleActions.length)];
+};
+
 const createRandomPolicy = (gridWorld) => {
-    return new Policy((state, action) => {
-        return gridWorld.actions[Math.floor(Math.random() * gridWorld.actions.length)];
-    });
+    return new Policy(createRandomDicision(gridWorld));
 };
 
 const createValueIterationPolicy = (gridWorld, epsilon) => {
     const policy = new Policy();
     const initializeValues = () => {
         const values = [];
-        for (let x = 0; x < gridWorld.width; x++) {
+        for (let x = 0; x < gridWorld.height; x++) {
             values[x] = [];
-            for (let y = 0; y < gridWorld.height; y++) {
+            for (let y = 0; y < gridWorld.width; y++) {
                 values[x][y] = 0;
             }
         }
@@ -23,6 +30,7 @@ const createValueIterationPolicy = (gridWorld, epsilon) => {
         gamma: 0.9,
         values: initializeValues()
     });
+    const randomDicision = createRandomDicision(gridWorld);
     policy.setDicision((state, action, reward) => {
         if (reward) {
             const values = policy.config.values;
@@ -33,13 +41,13 @@ const createValueIterationPolicy = (gridWorld, epsilon) => {
             if (state.value.x > 0) possibleStates.push(new GridState({
                 x: state.value.x - 1, y: state.value.y
             }));
-            if (state.value.x < width - 1) possibleStates.push(new GridState({
+            if (state.value.x < height - 1) possibleStates.push(new GridState({
                 x: state.value.x + 1, y: state.value.y
             }));
             if (state.value.y > 0) possibleStates.push(new GridState({
                 x: state.value.x, y: state.value.y - 1
             }));
-            if (state.value.y < height - 1) possibleStates.push(new GridState({
+            if (state.value.y < width - 1) possibleStates.push(new GridState({
                 x: state.value.x, y: state.value.y + 1
             }));
             const maxValue = Math.max(...possibleStates.map(state => {
@@ -65,7 +73,7 @@ const createValueIterationPolicy = (gridWorld, epsilon) => {
                 if (maxState.value.x < state.value.x) return GridWorld.UP;
             }
         }
-        return gridWorld.actions[Math.floor(Math.random() * gridWorld.actions.length)];
+        return randomDicision(state, action, reward);
     });
     return policy;
 };

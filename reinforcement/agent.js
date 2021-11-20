@@ -17,7 +17,7 @@ export default class Agent {
         return reward;
     }
 
-    next(action, reward) {
+    getNextAction(action, reward) {
         return this.policy.dicide(this.state, action, reward);
     }
 
@@ -32,7 +32,7 @@ export default class Agent {
 
     run(goalState, logger) {
         const actions = [];
-        let action = this.next();
+        let action = this.getNextAction();
         let step = 0;
         while (true) {
             const reward = this.act(action);
@@ -46,7 +46,7 @@ export default class Agent {
             });
             actions.push(action);
             if (this.state.equals(goalState)) break;
-            action = this.next(action, reward);
+            action = this.getNextAction(action, reward);
             step++;
             if (this.limit && step >= this.limit) break;
         }
