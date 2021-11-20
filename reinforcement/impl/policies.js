@@ -2,7 +2,7 @@ import { Policy } from '../base';
 import { GridWorld, GridState, GridAction } from './grid-world';
 
 const createRandomDicision = (gridWorld) => (state, action, reward) => {
-    const possibleActions = gridWorld.actions.filter(action => true); // copy
+    const possibleActions = gridWorld.actions.filter(each => true); // copy
     if (state.x === 0)
         possibleActions.splice(possibleActions.indexOf(GridAction.UP), 1);
     if (state.x === gridWorld.height - 1)
