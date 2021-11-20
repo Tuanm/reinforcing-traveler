@@ -41,6 +41,7 @@ class GridWorld extends Environment {
             }
         }
         this.goalState = this.states.find(state => state.equals(goalState));
+        if (!this.goalState) throw new UnknownValueError(goalState);
     }
 
     initializeRewards() {
@@ -48,7 +49,7 @@ class GridWorld extends Environment {
         for (const state of this.states) {
             this.rewards.push({
                 state: state,
-                reward: Math.random() * (Math.random() > 0.95 ? 1 : -1)
+                reward: Math.random() * (Math.random() > 0.95 ? 1 : -1) // random reward
             })
         }
         const goalIndex = this.states.findIndex(state => state.equals(this.goalState));

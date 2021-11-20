@@ -3,10 +3,14 @@ import { GridWorld, GridState } from './grid-world';
 
 const createRandomDicision = (gridWorld) => (state, action, reward) => {
     const possibleActions = gridWorld.actions.filter(action => true); // copy
-    if (state.x === 0) possibleActions.splice(possibleActions.indexOf(GridWorld.UP), 1);
-    if (state.x === gridWorld.height - 1) possibleActions.splice(possibleActions.indexOf(GridWorld.DOWN), 1);
-    if (state.y === 0) possibleActions.splice(possibleActions.indexOf(GridWorld.LEFT), 1);
-    if (state.y === gridWorld.width - 1) possibleActions.splice(possibleActions.indexOf(GridWorld.RIGHT), 1);
+    if (state.x === 0)
+        possibleActions.splice(possibleActions.indexOf(GridWorld.UP), 1);
+    if (state.x === gridWorld.height - 1)
+        possibleActions.splice(possibleActions.indexOf(GridWorld.DOWN), 1);
+    if (state.y === 0)
+        possibleActions.splice(possibleActions.indexOf(GridWorld.LEFT), 1);
+    if (state.y === gridWorld.width - 1)
+        possibleActions.splice(possibleActions.indexOf(GridWorld.RIGHT), 1);
     return possibleActions[Math.floor(Math.random() * possibleActions.length)];
 };
 
@@ -34,7 +38,7 @@ class ValueIterationPolicy extends Policy {
             values: initializeValues()
         });
         const randomDicision = createRandomDicision(gridWorld);
-        this.setDicision((state, action, reward) => {
+        this.setDicision((state, action, reward) => { // TODO: it doesn't work
             if (reward) {
                 const values = policy.config.values;
                 const lastValue = values[state.x][state.y];

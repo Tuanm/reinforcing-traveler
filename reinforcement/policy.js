@@ -2,7 +2,7 @@ import { NotImplementedError } from './error';
 
 export default class Policy {
     constructor(dicision) {
-        this.dicision = dicision;
+        this.setDicision(dicision);
     }
 
     setDicision(dicision) {
