@@ -1,9 +1,8 @@
 export default class Agent {
     constructor(environment, policy, initialState) {
         this.environment = environment;
-        this.policy = policy;
-        this.state = initialState;
-        this.totalReward = 0;
+        this.reset(initialState);
+        this.follow(policy);
     }
 
     follow(policy) {
@@ -30,14 +29,14 @@ export default class Agent {
         this.limit = limit;
     }
 
-    run(goalState, logger) {
+    run(goalState, log) {
         const actions = [];
         let action = this.getNextAction();
         let step = 0;
         while (true) {
             const reward = this.act(action);
             this.totalReward += reward;
-            if (logger) logger({
+            if (log) log({
                 step: step,
                 action: action,
                 state: this.state,
