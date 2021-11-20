@@ -1,5 +1,7 @@
-export default class Action {
+import SingleValue from './value';
+
+export default class Action extends SingleValue {
     constructor(value) {
-        this.value = value;
+        super(value);
     }
 };

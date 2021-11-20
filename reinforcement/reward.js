@@ -1,5 +1,7 @@
-export default class Reward {
+import SingleValue from './value';
+
+export default class Reward extends SingleValue {
     constructor(value) {
-        this.value = value;
+        super(value);
     }
 };

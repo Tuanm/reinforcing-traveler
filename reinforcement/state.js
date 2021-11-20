@@ -1,5 +1,7 @@
-export default class State {
+import SingleValue from './value';
+
+export default class State extends SingleValue {
     constructor(value) {
-        this.value = value;
+        super(value);
     }
 };
