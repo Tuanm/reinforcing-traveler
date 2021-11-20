@@ -78,7 +78,7 @@ class ValueIterationPolicy extends Policy {
 
     improve(gridWorld, config) {
         const iterations = config.iterations;
-        const epsilon = config.epsilon;
+        const epsilon = config.epsilon; // instead of using iterations
         const states = gridWorld.states;
         const actions = gridWorld.actions;
         const values = this.config.values;
@@ -96,6 +96,7 @@ class ValueIterationPolicy extends Policy {
                         }
                     }
                 }
+                // update values by Bellman equation with DP
                 const newValue = gridWorld.getReward(state)
                     + this.config.discount * maxValue;
                 values[state.x][state.y] = newValue;

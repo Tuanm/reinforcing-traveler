@@ -37,6 +37,7 @@ function start() {
     agent.reset(initialState);
     let valueIterationPolicyResult = agent.run(goalState);
 
+    // Results
     console.log(gridWorld.rewards);
     console.log(initialState);
     console.log(goalState);
@@ -45,3 +46,5 @@ function start() {
 }
 
 start();
+
+// TODO: Implement stochastic policies
