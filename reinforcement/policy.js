@@ -9,8 +9,12 @@ export default class Policy {
         this.dicision = dicision;
     }
 
-    dicide(state, action) {
-        if (this.dicision) return this.dicision(state, action);
+    update(config) {
+        this.config = config;
+    }
+
+    dicide(state, action, reward) {
+        if (this.dicision) return this.dicision(state, action, reward);
         throw new NotImplementedError();
     }
 };

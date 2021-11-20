@@ -14,11 +14,11 @@ export default class Agent {
         const response = this.environment.response(this.state, action);
         this.state = response.nextState;
         const reward = response.reward;
-        this.totalReward += reward;
+        return reward;
     }
 
-    next(action) {
-        return this.policy.dicide(this.state, action);
+    next(action, reward) {
+        return this.policy.dicide(this.state, action, reward);
     }
 
     reset(initialState) {
@@ -26,15 +26,29 @@ export default class Agent {
         this.totalReward = 0;
     }
 
+    setLimit(limit) {
+        this.limit = limit;
+    }
+
     run(goalState, logger) {
         const actions = [];
         let action = this.next();
+        let step = 0;
         while (true) {
-            this.act(action);
-            if (logger) logger(this);
+            const reward = this.act(action);
+            this.totalReward += reward;
+            if (logger) logger({
+                step: step,
+                action: action,
+                state: this.state,
+                reward: reward,
+                totalReward: this.totalReward
+            });
             actions.push(action);
             if (this.state.equals(goalState)) break;
-            action = this.next(action);
+            action = this.next(action, reward);
+            step++;
+            if (this.limit && step >= this.limit) break;
         }
         return {
             actions: actions,
