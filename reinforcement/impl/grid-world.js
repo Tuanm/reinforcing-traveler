@@ -98,22 +98,7 @@ class GridWorld extends Environment {
     }
 }
 
-const printRewardsAs2DArray = (gridWorld) => {
-    const rewards = gridWorld.rewards;
-    const rewards2DArray = [];
-    for (let x = 0; x < gridWorld.height; x++) {
-        rewards2DArray[x] = [];
-        for (let y = 0; y < gridWorld.width; y++) {
-            rewards2DArray[x][y] = rewards.find(reward => {
-                return reward.state.value.x === x && reward.state.value.y === y;
-            }).reward;
-        }
-    }
-    console.log(rewards2DArray);
-};
-
 export {
     GridWorld,
-    GridState,
-    printRewardsAs2DArray
+    GridState
 };
