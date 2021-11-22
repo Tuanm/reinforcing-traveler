@@ -12,8 +12,7 @@ export default class Agent {
     act(action) {
         const response = this.environment.response(this.state, action);
         this.state = response.nextState;
-        const reward = response.reward;
-        return reward;
+        return response.reward;
     }
 
     getNextAction(action, reward) {
