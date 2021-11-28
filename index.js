@@ -30,7 +30,7 @@ function start() {
     const valueIterationPolicy = new ValueIterationPolicy(gridWorld, {
         discount: 0.6
     });
-    valueIterationPolicy.improve(gridWorld, {
+    valueIterationPolicy.improve({
         iterations: 1000
     });
     agent.follow(valueIterationPolicy);

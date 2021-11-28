@@ -23,6 +23,7 @@ class RandomPolicy extends Policy {
 class ValueIterationPolicy extends Policy {
     constructor(gridWorld, config) {
         super();
+        this.environment = gridWorld;
         const initializeValues = () => {
             const values = [];
             for (let x = 0; x < gridWorld.height; x++) {
@@ -76,7 +77,8 @@ class ValueIterationPolicy extends Policy {
         });
     }
 
-    improve(gridWorld, config) {
+    improve(config) {
+        const gridWorld = this.environment;
         const iterations = config.iterations;
         const epsilon = config.epsilon; // instead of using iterations
         const states = gridWorld.states;

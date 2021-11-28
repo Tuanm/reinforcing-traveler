@@ -13,12 +13,16 @@ export default class Policy {
         this.config = config;
     }
 
+    improve(config) {
+        throw new NotImplementedError(this.improve);
+    }
+
     dicide(state, action, reward) {
         if (this.dicision) return this.dicision(state, action, reward);
         throw new NotImplementedError(this.dicide);
     }
 
-    save(path) {
+    save(config) {
         throw new NotImplementedError(this.save);
     }
 };
