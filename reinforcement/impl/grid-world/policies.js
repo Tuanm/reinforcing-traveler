@@ -1,5 +1,5 @@
 import { Policy } from '../../base';
-import { GridWorld, GridState, GridAction } from './grid-world';
+import { GridWorld, GridState, GridAction } from './environment';
 
 const createRandomDicision = (gridWorld) => (state, action, reward) => {
     const possibleActions = gridWorld.actions.filter(each => true); // copy

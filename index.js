@@ -1,6 +1,6 @@
 import { Agent } from './reinforcement/base';
-import { GridWorld, GridState } from './reinforcement/impl/grid-world/grid-world';
-import { RandomPolicy, ValueIterationPolicy } from './reinforcement/impl/grid-world/grid-world-policies';
+import { GridWorld, GridState } from './reinforcement/impl/grid-world/environment';
+import { RandomPolicy, ValueIterationPolicy } from './reinforcement/impl/grid-world/policies';
 
 function start() {
     // Initialize environment and agent
