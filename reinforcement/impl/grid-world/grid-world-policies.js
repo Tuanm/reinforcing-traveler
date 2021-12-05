@@ -1,4 +1,4 @@
-import { Policy } from '../base';
+import { Policy } from '../../base';
 import { GridWorld, GridState, GridAction } from './grid-world';
 
 const createRandomDicision = (gridWorld) => (state, action, reward) => {
