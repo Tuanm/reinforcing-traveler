@@ -1,8 +1,6 @@
 import { Environment } from '../../base';
 import { UnknownValueError } from '../../error';
 
-import fs from 'fs';
-
 class MazeState {
     static WALL = 'W';
     static GOAL = 'G';
@@ -28,14 +26,13 @@ class MazeAction {
 }
 
 class Maze extends Environment {
-    constructor(file) {
+    constructor(text) { // file content
         super();
-        this.initializeMazeFromFile(file);
+        this.initializeMazeFromText(text);
     }
 
-    initializeMazeFromFile(file) {
+    initializeMazeFromText(text) {
         const maze = [];
-        const text = fs.readFileSync(file, 'utf-8');
         const lines = text.split('\n');
         for (const line of lines) {
             const row = [];
@@ -105,7 +102,7 @@ class Maze extends Environment {
         const newState = this.getNextState(state, action);
         const reward = this.getReward(newState);
         return {
-            nextState: newState === MazeState.WALL ? state : newState,
+            nextState: newState.description === MazeState.WALL ? state : newState,
             reward: reward
         }
     }
@@ -138,6 +135,6 @@ class Maze extends Environment {
     }
 }
 
-export default {
+export {
     Maze, MazeState, MazeAction
 };

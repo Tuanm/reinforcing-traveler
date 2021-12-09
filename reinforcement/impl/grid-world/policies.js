@@ -114,6 +114,8 @@ class ValueIterationPolicy extends Policy {
     }
 }
 
+// TODO: Implement stochastic policies
+
 export {
     RandomPolicy,
     ValueIterationPolicy
