@@ -73,7 +73,7 @@ class StateActionPair {
 
 class StateActionPairMap extends WeakMap {
     get(stateActionPair) {
-        for (const key of this.keys()) {
+        for (const key of super.keys()) {
             if (key.equals(stateActionPair)) {
                 return super.get(key);
             }
@@ -82,7 +82,7 @@ class StateActionPairMap extends WeakMap {
     }
 
     set(stateActionPair, value) {
-        for (const key of this.keys()) {
+        for (const key of super.keys()) {
             if (key.equals(stateActionPair)) {
                 super.delete(key);
                 break;
