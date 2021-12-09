@@ -1,4 +1,5 @@
-import { Maze } from '../reinforcement/impl/maze/environment';
+import { Agent } from './../reinforcement/base';
+import { Maze } from './impl/maze/environment';
 import fs from 'fs';
 
 export function start() {
@@ -6,3 +7,5 @@ export function start() {
     const maze = new Maze(text);
     console.log(maze.states);
 }
+
+// TODO: Many things to do

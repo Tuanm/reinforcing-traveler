@@ -1,8 +1,8 @@
-import { Policy } from '../../base';
+import { Policy } from '../../../reinforcement/base';
 import { GridWorld, GridState, GridAction } from './environment';
 
 const createRandomDicision = (gridWorld) => (state, action, reward) => {
-    const possibleActions = gridWorld.actions.filter(each => true); // copy
+    const possibleActions = gridWorld.actions.filter(each => true); // copy all actions
     if (state.x === 0)
         possibleActions.splice(possibleActions.indexOf(GridAction.UP), 1);
     if (state.x === gridWorld.height - 1)

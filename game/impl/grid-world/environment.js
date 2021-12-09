@@ -1,5 +1,5 @@
-import { Environment } from '../../base';
-import { UnknownValueError } from '../../error';
+import { Environment } from '../../../reinforcement/base';
+import { UnknownValueError } from '../../../reinforcement/error';
 
 class GridState  {
     constructor(x, y) {
