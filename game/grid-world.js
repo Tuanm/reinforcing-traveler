@@ -2,7 +2,7 @@ import { Agent } from './../reinforcement/base';
 import { GridWorld, GridState } from './impl/grid-world/environment';
 import { RandomPolicy, ValueIterationPolicy } from './impl/grid-world/policies';
 
-export function start() {
+export function start() { // TODO: Load environment from files
     // Initialize environment and agent
     const width = 6;
     const height = 6;
