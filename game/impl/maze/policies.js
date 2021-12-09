@@ -71,7 +71,7 @@ class StateActionPair {
     }
 }
 
-class StateActionPairMap extends WeakMap {
+class StateActionPairMap extends Map {
     get(stateActionPair) {
         for (const key of super.keys()) {
             if (key.equals(stateActionPair)) {
