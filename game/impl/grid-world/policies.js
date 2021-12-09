@@ -55,12 +55,12 @@ class ValueIterationPolicy extends Policy {
                 if (state.y < gridWorld.width - 1) possibleStates.push(new GridState(
                     state.x, state.y + 1
                 ));
-                const maxValue = Math.max(...possibleStates.map(state => {
-                    return values[state.x][state.y];
+                const maxValue = Math.max(...possibleStates.map(each => {
+                    return values[each.x][each.y];
                 }));
                 // find state with max value
-                const maxStates = possibleStates.filter(state => {
-                    return values[state.x][state.y] === maxValue;
+                const maxStates = possibleStates.filter(each => {
+                    return values[each.x][each.y] === maxValue;
                 });
                 const maxState = maxStates[Math.floor(Math.random() * maxStates.length)];
                 // choose action for max state

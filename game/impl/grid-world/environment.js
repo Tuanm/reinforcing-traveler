@@ -90,7 +90,7 @@ class GridWorld extends Environment {
     }
 
     getReward(newState) {
-        const state = this.states.find(state => state.equals(newState));
+        const state = this.states.find(each => each.equals(newState));
         return this.rewards.find(reward => reward.state.equals(state)).reward;
     }
 
