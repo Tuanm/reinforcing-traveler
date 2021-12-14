@@ -29,6 +29,7 @@ class Maze extends Environment {
     constructor(text) { // file content
         super();
         this.initializeMazeFromText(text);
+        this.text = text;
     }
 
     initializeMazeFromText(text) {

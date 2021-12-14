@@ -9,8 +9,8 @@ class StateActionPair {
     }
 
     equals(other) {
-        return this.state === other.state
-            && this.action === other.action;
+        return this.state === other?.state
+            && this.action === other?.action;
     }
 }
 
@@ -85,6 +85,10 @@ class TDPolicy extends Policy {
             throw new UnknownValueError(this.config);
         }
     }
+
+    takeActionByPolicy(nextState) {
+        throw new NotImplementedError(this.takeActionByPolicy);
+    }
 }
 
 class OneStepTDPolicy extends TDPolicy {
@@ -149,7 +153,48 @@ class OneStepTDPolicy extends TDPolicy {
     }
 }
 
-class SARSAPolicy extends TDPolicy {}
+class SARSAPolicy extends TDPolicy {
+    constructor(actions, config) {
+        super(actions, config);
+        this.values = new StateActionPairMap(0); // (state, action) -> numeric value
+        this.policy = new StateMap(0); // state -> action
+    }
+
+    // return an action
+    takeActionByPolicy(nextState) {
+        if (nextState === undefined || (
+            this.greedyRate != undefined && Math.random() < this.greedyRate
+        )) {
+            return this.actions[Math.floor(Math.random() * this.actions.length)];
+        }
+
+        const nextActions = [];
+        let maxValue = -Infinity;
+        for (const stateActionPair of this.values.keys()) {
+            if (this.values.get(stateActionPair) >= maxValue) {
+                nextActions.push(stateActionPair.action);
+            }
+        }
+        if (nextActions.length === 0) nextActions.push(...this.actions);
+
+        return nextActions[Math.floor(Math.random() * nextActions.length)];
+    }
+
+    dicide(state, action, reward, nextState) { // return an action
+        const nextAction = this.takeActionByPolicy(nextState);
+        if (state !== undefined && reward !== undefined) {
+            const currentValue = this.values.get(new StateActionPair(state, action));
+            const nextValue = this.values.get(new StateActionPair(nextState, nextAction));
+            let tdError = reward + (
+                this.discountFactor * nextValue - currentValue
+            );
+            this.values.set(new StateActionPair(state, action), currentValue + (
+                this.learningRate * tdError
+            ));
+        }
+        return nextAction;
+    }
+}
 
 class QLearningPolicy extends TDPolicy {}
 
