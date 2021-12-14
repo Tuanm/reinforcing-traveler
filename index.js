@@ -1,4 +1,4 @@
-import { start } from './game/grid-world';
-// import { start } from './game/maze';
+// import { start } from './game/grid-world';
+import { start } from './game/maze';
 
 start();
