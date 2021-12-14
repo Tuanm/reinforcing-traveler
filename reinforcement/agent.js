@@ -50,8 +50,8 @@ export default class Agent {
             if (reward !== undefined) this.totalReward += reward;
             if (log) log({
                 step: step,
-                action: action,
                 state: this.state,
+                action: action,
                 nextState: nextState,
                 reward: reward,
                 totalReward: this.totalReward
