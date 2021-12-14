@@ -19,6 +19,7 @@ export default class Environment {
         this.rewards = rewards;
     }
 
+    // return { nextState, reward }
     response(state, action) {
         throw new NotImplementedError(this.response);
     }
