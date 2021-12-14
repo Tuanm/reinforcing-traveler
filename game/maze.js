@@ -16,13 +16,13 @@ export function start(file) {
         greedyRate: 0.2
     });
     const sarsaPolicy = new SARSAPolicy(maze.actions, {
-        learningRate: 1,
-        discountFactor: 0.8,
+        learningRate: 0.5,
+        discountFactor: 0.7,
         greedyRate: 0.2
     });
     agent.follow(sarsaPolicy);
     agent.setLimit(100);
-    for (let episode = 0; episode < 100; episode++) {
+    for (let episode = 0; episode < 1000; episode++) {
         agent.reset(new MazeState(1, 1));
         const result = agent.run();
         console.log(result);

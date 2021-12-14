@@ -31,6 +31,7 @@ export default class Agent {
 
     run(goalState, log) {
         const actions = [];
+        const states = [this.state];
         let action = this.getNextAction();
         let step = 0;
         let isTerminated = false;
@@ -58,11 +59,13 @@ export default class Agent {
             if (isTerminated || nextState?.equals(goalState)) break;
             action = this.getNextAction(action, reward, nextState);
             this.state = nextState;
+            states.push(this.state);
             step++;
             if (this.limit !== undefined && step >= this.limit) break;
         }
         return {
             actions: actions,
+            states: states,
             totalReward: this.totalReward
         };
     }
