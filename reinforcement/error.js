@@ -10,9 +10,17 @@ class UnknownValueError extends Error {
         super(message);
         this.value = value;
     }
-};
+}
+
+class TerminalStateError extends Error {
+    constructor(reward, message) {
+        super(message);
+        this.reward = reward;
+    }
+}
 
 export {
     NotImplementedError,
-    UnknownValueError
+    UnknownValueError,
+    TerminalStateError
 };

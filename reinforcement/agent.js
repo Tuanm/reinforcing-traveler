@@ -9,14 +9,14 @@ export default class Agent {
         this.policy = policy;
     }
 
+    // return { nextState, reward }
     act(action) {
-        const response = this.environment.response(this.state, action);
-        this.state = response.nextState;
-        return response.reward;
+        return this.environment.response(this.state, action);
     }
 
-    getNextAction(action, reward) {
-        return this.policy.dicide(this.state, action, reward);
+    // return an action
+    getNextAction(action, reward, nextState) {
+        return this.policy.dicide(this.state, action, reward, nextState);
     }
 
     reset(initialState) {
@@ -32,21 +32,33 @@ export default class Agent {
         const actions = [];
         let action = this.getNextAction();
         let step = 0;
+        let isTerminated = false;
         while (true) {
-            const reward = this.act(action);
-            this.totalReward += reward;
+            let response;
+            try {
+                response = this.act(action)
+                actions.push(action);
+            } catch (err) { // if enviroment throws a TerminalStateError
+                const terminalReward = err?.reward;
+                if (terminalReward !== undefined) this.totalReward += terminalReward;
+                isTerminated = true;
+            }
+            const nextState = response?.nextState;
+            const reward = response?.reward;
+            if (reward !== undefined) this.totalReward += reward;
             if (log) log({
                 step: step,
                 action: action,
                 state: this.state,
+                nextState: nextState,
                 reward: reward,
                 totalReward: this.totalReward
             });
-            actions.push(action);
-            if (this.state.equals(goalState)) break;
-            action = this.getNextAction(action, reward);
+            if (isTerminated || nextState?.equals(goalState)) break;
+            action = this.getNextAction(action, reward, nextState);
+            this.state = nextState;
             step++;
-            if (this.limit && step >= this.limit) break;
+            if (this.limit !== undefined && step >= this.limit) break;
         }
         return {
             actions: actions,

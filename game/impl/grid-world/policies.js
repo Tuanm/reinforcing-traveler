@@ -1,7 +1,7 @@
 import { Policy } from '../../../reinforcement/base';
 import { GridWorld, GridState, GridAction } from './environment';
 
-const createRandomDicision = (gridWorld) => (state, action, reward) => {
+const createRandomDicision = (gridWorld) => (state, action, reward, nextState) => {
     const possibleActions = gridWorld.actions.filter(each => true); // copy all actions
     if (state.x === 0)
         possibleActions.splice(possibleActions.indexOf(GridAction.UP), 1);
@@ -39,7 +39,7 @@ class ValueIterationPolicy extends Policy {
             values: initializeValues()
         });
         const randomDicision = createRandomDicision(gridWorld);
-        this.setDicision((state, action, reward) => {
+        this.setDicision((state, action, reward, nextState) => {
             if (reward) {
                 const values = this.config.values;
                 const possibleStates = [];

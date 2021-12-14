@@ -1,5 +1,5 @@
 import { Environment } from '../../../reinforcement/base';
-import { UnknownValueError } from '../../../reinforcement/error';
+import { UnknownValueError, TerminalStateError } from '../../../reinforcement/error';
 
 class MazeState {
     static WALL = 'W';
@@ -101,6 +101,9 @@ class Maze extends Environment {
     response(state, action) {
         const newState = this.getNextState(state, action);
         const reward = this.getReward(newState);
+        if (newState.description === MazeState.GOAL) {
+            throw new TerminalStateError(reward);
+        }
         return {
             nextState: newState.description === MazeState.WALL ? state : newState,
             reward: reward

@@ -67,7 +67,7 @@ class OneStepTD extends TDPolicy {
         this.discountFactor = config?.discountFactor; // gamma
     }
 
-    dicide(state, action, reward) { // return an action
+    dicide(state, action, reward, nextState) { // return an action
         // TODO: Implement TD(0)
         const nextAction = this.policy.get(state);
         if (!nextAction) { // choose random action
