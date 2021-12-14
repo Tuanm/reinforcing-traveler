@@ -1,64 +1,6 @@
 import { Policy } from './../../../reinforcement/base';
 import { NotImplementedError } from './../../../reinforcement/error';
 
-// TODO: Implement Monte-Carlo methods
-
-class MonteCarloPolicy extends Policy {}
-
-class MonteCarloPredictionPolicy extends MonteCarloPolicy {
-    constructor() {
-        super();
-        this.experiences = [];
-    }
-}
-
-class FirstVisitMonteCarloPredictionPolicy extends MonteCarloPredictionPolicy {
-    constructor() {
-        super();
-        this.returnsMap = new Map(); // contains returns following the first occurance of each state s
-    }
-
-    addReturn(newReturn, state, action) {
-        throw new NotImplementedError(this.addReturn);
-    }
-
-    getAverageReturn(state, action) {
-        throw new NotImplementedError(this.getAverageReturn);
-    }
-}
-
-class StateValueFirstVisitMonteCarloPredictionPolicy extends FirstVisitMonteCarloPredictionPolicy {
-    constructor() {
-        super();
-    }
-
-    addReturn(newReturn, state, action) {
-        let returns = this.returnsMap.get(state);
-        if (!returns) returns = [];
-        returns.push(newReturn);
-        this.returnsMap.set(state, returns);
-    }
-
-    getAverageReturn(state, action) {
-        let returns = this.returnsMap.get(state);
-        if (!returns) return 0;
-        return returns.reduce((prev, curr) => prev + curr);
-    }
-
-    improve(config) {
-        throw new NotImplementedError(this.improve);
-    }
-
-    dicide(state, action, reward) {
-        if (this.dicision) return this.dicision(state, action, reward);
-        throw new NotImplementedError(this.dicide);
-    }
-
-    save(config) {
-        throw new NotImplementedError(this.save);
-    }
-}
-
 class StateActionPair {
     constructor(state, action) {
         this.state = state;
@@ -92,43 +34,56 @@ class StateActionPairMap extends Map {
     }
 }
 
-class StateActionValueFirstVisitMonteCarloPredictionPolicy extends FirstVisitMonteCarloPredictionPolicy {
-    constructor() {
-        super();
-        this.returnsMap = new StateActionPairMap();
+class StateMap extends Map {
+    get(state) {
+        for (const key of super.keys()) {
+            if (key.equals(state)) {
+                return super.get(key);
+            }
+        }
+        return undefined;
     }
 
-    addReturn(newReturn, state, action) {
-        const stateActionPair = new StateActionPair(state, action);
-        let returns = this.returnsMap.get(stateActionPair);
-        if (!returns) returns = [];
-        returns.push(newReturn);
-        this.returnsMap.set(stateActionPair, returns);
-    }
-
-    getAverageReturn(state, action) {
-        const stateActionPair = new StateActionPair(state, action);
-        let returns = this.returnsMap.get(stateActionPair);
-        if (!returns) return 0;
-        return returns.reduce((prev, curr) => prev + curr);
-    }
-
-    improve(config) {
-        throw new NotImplementedError(this.improve);
-    }
-
-    dicide(state, action, reward) {
-        if (this.dicision) return this.dicision(state, action, reward);
-        throw new NotImplementedError(this.dicide);
-    }
-
-    save(config) {
-        throw new NotImplementedError(this.save);
+    set(state, value) {
+        for (const key of super.keys()) {
+            if (key.equals(state)) {
+                super.delete(key);
+                break;
+            }
+        }
+        super.set(state, value);
     }
 }
 
-class EveryVisitMonteCarloPredictionPolicy extends MonteCarloPredictionPolicy {}
+class TDPolicy extends Policy {}
+
+class OneStepTD extends TDPolicy {
+    constructor(actions, config) {
+        super();
+        this.actions = actions;
+        this.values = new StateMap(); // state -> numeric value
+        this.policy = new StateMap(); // state -> action
+        this.learningRate = config?.learningRate; // alpha
+        this.discountFactor = config?.discountFactor; // gamma
+    }
+
+    dicide(state, action, reward) { // return an action
+        // TODO: Implement TD(0)
+        const nextAction = this.policy.get(state);
+        if (!nextAction) { // choose random action
+            return this.actions[[Math.floor(Math.random() * this.actions.length)]]
+        }
+        return nextAction;
+    }
+}
+
+class SARSAPolicy extends TDPolicy {}
+
+class QLearningPolicy extends TDPolicy {}
+
 
 export {
-    MonteCarloPolicy
+    OneStepTD,
+    SARSAPolicy,
+    QLearningPolicy
 };
