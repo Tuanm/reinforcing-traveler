@@ -13,8 +13,8 @@ class MazeState {
     }
 
     equals(other) {
-        return this.x === other.x
-            && this.y === other.y;
+        return this.x === other?.x
+            && this.y === other?.y;
     }
 }
 
@@ -107,12 +107,12 @@ class Maze extends Environment {
         return {
             nextState: newState.description === MazeState.WALL ? state : newState,
             reward: reward
-        }
+        };
     }
 
     getNextState(state, action) {
-        const x = state.x;
-        const y = state.y;
+        let x = state?.x;
+        let y = state?.y;
         switch (action) {
             case MazeAction.LEFT:
                 if (y > 0) y--;
@@ -134,7 +134,7 @@ class Maze extends Environment {
     }
 
     getReward(newState) {
-        return this.rewards[newState.x][newState.y];
+        return this.rewards[newState.x][newState.y]?.reward;
     }
 }
 

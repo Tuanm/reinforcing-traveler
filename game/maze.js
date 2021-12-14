@@ -9,13 +9,17 @@ export function start(file) {
     }
     const text = fs.readFileSync(file, 'utf-8');
     const maze = new Maze(text);
-    const agent = new Agent(maze, new MazeState(0, 0));
+    const agent = new Agent(maze);
     const oneStepTDPolicy = new OneStepTDPolicy(maze.actions, {
         learningRate: 0.5,
         discountFactor: 0.9,
         greedyRate: 0.1
     });
     agent.follow(oneStepTDPolicy);
-    const result = agent.run();
-    console.log(result);
+    agent.setLimit(100);
+    for (let episode = 0; episode < 100; episode++) {
+        agent.reset(new MazeState(0, 0));
+        const result = agent.run();
+        console.log(result);
+    }
 };

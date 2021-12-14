@@ -24,6 +24,7 @@ export default class Agent {
         this.totalReward = 0;
     }
 
+    // max steps
     setLimit(limit) {
         this.limit = limit;
     }

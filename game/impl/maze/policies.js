@@ -15,13 +15,18 @@ class StateActionPair {
 }
 
 class StateActionPairMap extends Map {
+    constructor(defaultValue) {
+        super();
+        this.setDefault(defaultValue);
+    }
+
     get(stateActionPair) {
         for (const key of super.keys()) {
             if (key?.equals(stateActionPair)) {
                 return super.get(key);
             }
         }
-        return undefined;
+        return this.defaultValue;
     }
 
     set(stateActionPair, value) {
@@ -33,16 +38,25 @@ class StateActionPairMap extends Map {
         }
         super.set(stateActionPair, value);
     }
+
+    setDefault(defaultValue) {
+        this.defaultValue = defaultValue;
+    }
 }
 
 class StateMap extends Map {
+    constructor(defaultValue) {
+        super();
+        this.setDefault(defaultValue);
+    }
+
     get(state) {
         for (const key of super.keys()) {
             if (key?.equals(state)) {
                 return super.get(key);
             }
         }
-        return undefined;
+        return this.defaultValue;
     }
 
     set(state, value) {
@@ -53,6 +67,10 @@ class StateMap extends Map {
             }
         }
         super.set(state, value);
+    }
+
+    setDefault(defaultValue) {
+        this.defaultValue = defaultValue;
     }
 }
 
@@ -72,12 +90,18 @@ class TDPolicy extends Policy {
 class OneStepTDPolicy extends TDPolicy {
     constructor(actions, config) {
         super(actions, config);
-        this.values = new StateMap(); // state -> numeric value
-        this.policy = new StateMap(); // state -> action
+        this.values = new StateMap(0); // state -> numeric value
+        this.policy = new StateMap(0); // state -> action
     }
 
     // return an action
     takeActionByPolicy(nextState) {
+        if (nextState === undefined || (
+            this.greedyRate != undefined && Math.random() < this.greedyRate
+        )) {
+            return this.actions[Math.floor(Math.random() * this.actions.length)];
+        }
+
         const possibleWays = [
             {
                 state: new MazeState(nextState?.x - 1, nextState?.y),
@@ -97,31 +121,30 @@ class OneStepTDPolicy extends TDPolicy {
             }
         ];
 
+        const nextActions = [];
         let maxValue = -Infinity;
-        let nextNextState;
-        let nextAction;
-        possibleWays.forEach(way => {
+        for (const way of possibleWays) {
             const state = way?.state;
             const action = way?.action;
             const value = this.values.get(state);
-            if (value > maxValue) {
+            if (value >= maxValue) {
                 maxValue = value;
-                nextNextState = state;
-                nextAction = action;
+                nextActions.push(action);
             }
-        });
-
-        if (this.greedyRate != undefined && Math.random() < this.greedyRate) {
-            return this.actions[[Math.floor(Math.random() * this.actions.length)]]
         }
-        return nextAction;
+
+        return nextActions[Math.floor(Math.random() * nextActions.length)];
     }
 
     dicide(state, action, reward, nextState) { // return an action
-        let tdError = reward + (
-            this.config?.discountFactor * this.values.get(nextState) - this.values.get(state)
-        );
-        this.values.set(state, this.values.get(state) + this.config?.learningRate * tdError);
+        if (state !== undefined && reward !== undefined) {
+            const currentStateValue = this.values.get(state);
+            const nextStateValue = this.values.get(nextState);
+            let tdError = reward + (
+                this.discountFactor * nextStateValue - currentStateValue
+            );
+            this.values.set(state, currentStateValue + this.learningRate * tdError);
+        }
         return this.takeActionByPolicy(nextState);
     }
 }
