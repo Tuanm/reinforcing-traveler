@@ -30,13 +30,16 @@ class StateActionPairMap extends Map {
     }
 
     set(stateActionPair, value) {
+        if (value === undefined) value = this.defaultValue;
+        let foundKey;
         for (const key of super.keys()) {
             if (key?.equals(stateActionPair)) {
-                super.delete(key);
+                foundKey = key;
                 break;
             }
         }
-        super.set(stateActionPair, value);
+        if (foundKey !== undefined) super.set(foundKey, value);
+        else super.set(stateActionPair, value);
     }
 
     setDefault(defaultValue) {
@@ -60,17 +63,37 @@ class StateMap extends Map {
     }
 
     set(state, value) {
+        if (value === undefined) value = this.defaultValue;
+        let foundKey;
         for (const key of super.keys()) {
             if (key?.equals(state)) {
-                super.delete(key);
+                foundKey = key;
                 break;
             }
         }
-        super.set(state, value);
+        if (foundKey !== undefined) super.set(foundKey, value);
+        else super.set(stateActionPair, value);
     }
 
     setDefault(defaultValue) {
         this.defaultValue = defaultValue;
+    }
+}
+
+class StateSet extends Set {
+    constructor() {
+        super();
+    }
+
+    add(state) {
+        if (!this.has(state)) super.add(state);
+    }
+
+    has(state) {
+        for (const element of super.values()) {
+            if (element?.equals(state)) return true;
+        }
+        return false;
     }
 }
 
@@ -84,10 +107,19 @@ class TDPolicy extends Policy {
         if (this.learningRate === undefined || this.discountFactor === undefined) {
             throw new UnknownValueError(this.config);
         }
+        this.visitedStates = new StateSet(); // contains visited states
+    }
+
+    initializeValuesOnFirstVisit(state) {
+        throw new NotImplementedError(this.initializeValuesOnFirstVisit);
     }
 
     takeActionByPolicy(nextState) {
         throw new NotImplementedError(this.takeActionByPolicy);
+    }
+
+    isValid(nextState) {
+        return nextState.description !== MazeState.WALL;
     }
 }
 
@@ -95,7 +127,11 @@ class OneStepTDPolicy extends TDPolicy {
     constructor(actions, config) {
         super(actions, config);
         this.values = new StateMap(0); // state -> numeric value
-        this.policy = new StateMap(0); // state -> action
+        this.policy = new StateMap(); // state -> action
+    }
+
+    initializeValuesOnFirstVisit(state) {
+        this.visitedStates.add(state);
     }
 
     // return an action
@@ -142,6 +178,9 @@ class OneStepTDPolicy extends TDPolicy {
 
     dicide(state, action, reward, nextState) { // return an action
         if (state !== undefined && reward !== undefined) {
+            if (!this.visitedStates.has(state)) {
+                this.initializeValuesOnFirstVisit(state);
+            }
             const currentStateValue = this.values.get(state);
             const nextStateValue = this.values.get(nextState);
             let tdError = reward + (
@@ -157,7 +196,14 @@ class SARSAPolicy extends TDPolicy {
     constructor(actions, config) {
         super(actions, config);
         this.values = new StateActionPairMap(0); // (state, action) -> numeric value
-        this.policy = new StateMap(0); // state -> action
+        this.policy = new StateMap(); // state -> action
+    }
+
+    initializeValuesOnFirstVisit(state) {
+        this.visitedStates.add(state);
+        for (const action of this.actions) {
+            this.values.set(new StateActionPair(state, action));
+        }
     }
 
     // return an action
@@ -171,8 +217,11 @@ class SARSAPolicy extends TDPolicy {
         const nextActions = [];
         let maxValue = -Infinity;
         for (const stateActionPair of this.values.keys()) {
-            if (this.values.get(stateActionPair) >= maxValue) {
-                nextActions.push(stateActionPair.action);
+            if (stateActionPair.state.equals(nextState)) {
+                if (this.values.get(stateActionPair) >= maxValue) {
+                    maxValue = this.values.get(stateActionPair);
+                    nextActions.push(stateActionPair.action);
+                }
             }
         }
         if (nextActions.length === 0) nextActions.push(...this.actions);
@@ -183,6 +232,9 @@ class SARSAPolicy extends TDPolicy {
     dicide(state, action, reward, nextState) { // return an action
         const nextAction = this.takeActionByPolicy(nextState);
         if (state !== undefined && reward !== undefined) {
+            if (!this.visitedStates.has(state)) {
+                this.initializeValuesOnFirstVisit(state);
+            }
             const currentValue = this.values.get(new StateActionPair(state, action));
             const nextValue = this.values.get(new StateActionPair(nextState, nextAction));
             let tdError = reward + (
@@ -196,7 +248,69 @@ class SARSAPolicy extends TDPolicy {
     }
 }
 
-class QLearningPolicy extends TDPolicy {}
+class QLearningPolicy extends TDPolicy {
+    constructor(actions, config) {
+        super(actions, config);
+        this.values = new StateActionPairMap(0); // (state, action) -> numeric value
+        this.policy = new StateMap(0); // state -> action
+    }
+
+    initializeValuesOnFirstVisit(state) {
+        this.visitedStates.add(state);
+        for (const action of this.actions) {
+            this.values.set(new StateActionPair(state, action));
+        }
+    }
+
+    // return an action
+    takeActionByPolicy(nextState) {
+        if (nextState === undefined || (
+            this.greedyRate != undefined && Math.random() < this.greedyRate
+        )) {
+            return this.actions[Math.floor(Math.random() * this.actions.length)];
+        }
+
+        const nextActions = [];
+        let maxValue = -Infinity;
+        for (const stateActionPair of this.values.keys()) {
+            if (stateActionPair.state.equals(nextState)) {
+                if (this.values.get(stateActionPair) >= maxValue) {
+                    maxValue = this.values.get(stateActionPair);
+                    nextActions.push(stateActionPair.action);
+                }
+            }
+        }
+        if (nextActions.length === 0) nextActions.push(...this.actions);
+
+        return nextActions[Math.floor(Math.random() * nextActions.length)];
+    }
+
+    dicide(state, action, reward, nextState) { // return an action
+        const nextAction = this.takeActionByPolicy(nextState);
+        if (state !== undefined && reward !== undefined) {
+            if (!this.visitedStates.has(state)) {
+                this.initializeValuesOnFirstVisit(state);
+            }
+            const currentValue = this.values.get(new StateActionPair(state, action));
+            let maxValue = this.values.get(new StateActionPair(nextState, nextAction));
+            for (const stateActionPair of this.values.keys()) {
+                if (stateActionPair.state.equals(nextState)) {
+                    if (this.values.get(stateActionPair) >= maxValue) {
+                        maxValue = this.values.get(stateActionPair);
+                    }
+                }
+            }
+            const nextValue = maxValue;
+            let tdError = reward + (
+                this.discountFactor * nextValue - currentValue
+            );
+            this.values.set(new StateActionPair(state, action), currentValue + (
+                this.learningRate * tdError
+            ));
+        }
+        return nextAction;
+    }
+}
 
 
 export {

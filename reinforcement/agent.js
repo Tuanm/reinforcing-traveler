@@ -19,6 +19,12 @@ export default class Agent {
         return this.policy.dicide(this.state, action, reward, nextState);
     }
 
+    updateState(nextState) {
+        if (this.policy.isValid(nextState)) {
+            this.state = nextState;
+        }
+    }
+
     reset(initialState) {
         this.state = initialState;
         this.totalReward = 0;
@@ -58,7 +64,7 @@ export default class Agent {
             });
             if (isTerminated || nextState?.equals(goalState)) break;
             action = this.getNextAction(action, reward, nextState);
-            this.state = nextState;
+            this.updateState(nextState);
             states.push(this.state);
             step++;
             if (this.limit !== undefined && step >= this.limit) break;

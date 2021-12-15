@@ -1,6 +1,6 @@
 import { Agent } from './../reinforcement/base';
 import { Maze, MazeState } from './impl/maze/environment';
-import { OneStepTDPolicy, SARSAPolicy } from './impl/maze/policies';
+import { OneStepTDPolicy, SARSAPolicy, QLearningPolicy } from './impl/maze/policies';
 import fs from 'fs';
 
 export function start(file) {
@@ -20,12 +20,16 @@ export function start(file) {
         discountFactor: 0.7,
         greedyRate: 0.2
     });
-    agent.follow(sarsaPolicy);
+    const qlearningPolicy = new QLearningPolicy(maze.actions, {
+        learningRate: 0.6,
+        discountFactor: 0.7,
+        greedyRate: 0.1
+    });
+    agent.follow(qlearningPolicy);
     agent.setLimit(100);
-    for (let episode = 0; episode < 1000; episode++) {
+    for (let episode = 0; episode < 200; episode++) {
         agent.reset(new MazeState(1, 1));
-        const result = agent.run();
-        console.log(result);
+        agent.run().then(console.log);
     }
     console.log(maze.text);
 };

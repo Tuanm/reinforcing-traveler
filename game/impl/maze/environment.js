@@ -84,10 +84,10 @@ class Maze extends Environment {
                         reward = 0;
                         break;
                     case MazeState.WALL:
-                        reward = -1;
+                        reward = -5;
                         break;
                     case MazeState.GOAL:
-                        reward = 1;
+                        reward = 10;
                         break;
                 }
                 row.push({
@@ -106,7 +106,7 @@ class Maze extends Environment {
             throw new TerminalStateError(reward);
         }
         return {
-            nextState: newState.description === MazeState.WALL ? state : newState,
+            nextState: newState,
             reward: reward
         };
     }
