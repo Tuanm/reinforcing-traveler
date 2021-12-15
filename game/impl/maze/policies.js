@@ -224,12 +224,18 @@ class SARSAPolicy extends TDPolicy {
         const explorationAction = this.tryExplore(nextState);
         if (explorationAction !== undefined) return explorationAction;
 
-        const nextActions = [];
         let maxValue = this.values.defaultValue;
         for (const stateActionPair of this.values.keys()) {
             if (stateActionPair.state.equals(nextState)) {
                 if (this.values.get(stateActionPair) >= maxValue) {
                     maxValue = this.values.get(stateActionPair);
+                }
+            }
+        }
+        const nextActions = [];
+        for (const stateActionPair of this.values.keys()) {
+            if (stateActionPair.state.equals(nextState)) {
+                if (this.values.get(stateActionPair) == maxValue) {
                     nextActions.push(stateActionPair.action);
                 }
             }
@@ -278,13 +284,20 @@ class QLearningPolicy extends TDPolicy {
         const explorationAction = this.tryExplore(nextState);
         if (explorationAction !== undefined) return explorationAction;
 
-        const nextActions = [];
         let maxValue = -Infinity;
         for (const stateActionPair of this.values.keys()) {
             if (stateActionPair.state.equals(nextState)) {
                 const value = this.values.get(stateActionPair);
                 if (value >= maxValue) {
                     maxValue = value;
+                }
+            }
+        }
+        const nextActions = [];
+        for (const stateActionPair of this.values.keys()) {
+            if (stateActionPair.state.equals(nextState)) {
+                const value = this.values.get(stateActionPair);
+                if (value == maxValue) {
                     nextActions.push(stateActionPair.action);
                 }
             }
