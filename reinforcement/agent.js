@@ -29,7 +29,7 @@ export default class Agent {
         this.limit = limit;
     }
 
-    run(goalState, log) {
+    async run(goalState, log) {
         const actions = [];
         const states = [this.state];
         let action = this.getNextAction();
@@ -48,7 +48,7 @@ export default class Agent {
             const nextState = response?.nextState;
             const reward = response?.reward;
             if (reward !== undefined) this.totalReward += reward;
-            if (log) log({
+            if (log) await log({
                 step: step,
                 state: this.state,
                 action: action,
