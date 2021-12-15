@@ -202,7 +202,9 @@ class OneStepTDPolicy extends TDPolicy {
             );
             this.values.set(state, currentStateValue + this.learningRate * tdError);
         }
-        return this.takeActionByPolicy(nextState);
+        return this.takeActionByPolicy(
+            nextState?.description === MazeState.WALL ? state : nextState
+        );
     }
 }
 
@@ -243,7 +245,9 @@ class SARSAPolicy extends TDPolicy {
     }
 
     dicide(state, action, reward, nextState) { // return an action
-        const nextAction = this.takeActionByPolicy(nextState);
+        const nextAction = this.takeActionByPolicy(
+            nextState?.description === MazeState.WALL ? state : nextState
+        );
         if (state !== undefined && reward !== undefined) {
             if (!this.visitedStates.has(state)) {
                 this.initializeValuesOnFirstVisit(state);
@@ -298,13 +302,12 @@ class QLearningPolicy extends TDPolicy {
     }
 
     dicide(state, action, reward, nextState) { // return an action
-        const nextAction = this.takeActionByPolicy(nextState);
         if (state !== undefined && reward !== undefined) {
             if (!this.visitedStates.has(state)) {
                 this.initializeValuesOnFirstVisit(state);
             }
             const currentValue = this.values.get(new StateActionPair(state, action));
-            let maxValue = this.values.get(new StateActionPair(nextState, nextAction));
+            let maxValue = -Infinity;
             for (const stateActionPair of this.values.keys()) {
                 if (stateActionPair.state.equals(nextState)) {
                     if (this.values.get(stateActionPair) >= maxValue) {
@@ -320,7 +323,9 @@ class QLearningPolicy extends TDPolicy {
                 this.learningRate * tdError
             ));
         }
-        return nextAction;
+        return this.takeActionByPolicy(
+            nextState?.description === MazeState.WALL ? state : nextState
+        );
     }
 }
 

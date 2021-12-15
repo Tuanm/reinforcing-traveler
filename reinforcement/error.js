@@ -13,9 +13,10 @@ class UnknownValueError extends Error {
 }
 
 class TerminalStateError extends Error {
-    constructor(reward, message) {
+    constructor(reward, goalReached, message) {
         super(message);
         this.reward = reward;
+        this.goalReached = goalReached;
     }
 }
 

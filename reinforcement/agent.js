@@ -45,6 +45,7 @@ export default class Agent {
         let action = this.getNextAction();
         let step = 0;
         let isTerminated = false;
+        let goalReached = false;
         while (true) {
             let response;
             try {
@@ -52,6 +53,7 @@ export default class Agent {
                 actions.push(action);
             } catch (err) { // if enviroment throws a TerminalStateError
                 const terminalReward = err?.reward;
+                goalReached = err?.goalReached;
                 if (terminalReward !== undefined) this.totalReward += terminalReward;
                 isTerminated = true;
             }
@@ -76,7 +78,8 @@ export default class Agent {
         return {
             actions: actions,
             states: states,
-            totalReward: this.totalReward
+            totalReward: this.totalReward,
+            goalReached: goalReached
         };
     }
 };

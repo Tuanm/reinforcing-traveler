@@ -103,7 +103,7 @@ class Maze extends Environment {
         const newState = this.getNextState(state, action);
         const reward = this.getReward(newState);
         if (newState.description === MazeState.GOAL) {
-            throw new TerminalStateError(reward);
+            throw new TerminalStateError(reward, true);
         }
         return {
             nextState: newState,

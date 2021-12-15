@@ -3,7 +3,7 @@ import { Maze, MazeState } from './impl/maze/environment';
 import { OneStepTDPolicy, SARSAPolicy, QLearningPolicy } from './impl/maze/policies';
 import fs from 'fs';
 
-export function start(file) {
+export async function start(file) {
     if (!file) {
         file = 'data/maze.txt'; // default
     }
@@ -22,15 +22,28 @@ export function start(file) {
     });
     const qlearningPolicy = new QLearningPolicy(maze.actions, {
         learningRate: 0.6,
-        discountFactor: 0.7,
-        greedyRate: 0.1
+        discountFactor: 0.7
     });
     agent.follow(qlearningPolicy);
-    agent.setLimit(100);
-    for (let episode = 0; episode < 50; episode++) {
-        agent.reset(new MazeState(1, 1));
-        agent.run().then(console.log);
-        agent.getPolicy().save({ filePath: `.res/maze/policy${episode}.json` });
+    agent.setLimit(500);
+    const initialState = new MazeState(1, 1);
+    const episodes = 1000;
+
+    qlearningPolicy.greedyRate = 1;
+    for (let episode = 0; episode < episodes / 10; episode++) {
+        agent.reset(initialState);
+        await agent.run().then(res => console.log(res.totalReward));
     }
+
+    qlearningPolicy.greedyRate = 0.3;
+    for (let episode = episodes / 10; episode < episodes; episode++) {
+        agent.reset(initialState);
+        await agent.run().then(res => console.log(res.totalReward));
+    }
+
+    qlearningPolicy.greedyRate = 0;
+    agent.reset(initialState);
+    await agent.run().then(console.log);
+
     console.log(maze.text);
 };
