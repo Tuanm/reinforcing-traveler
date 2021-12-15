@@ -64,7 +64,6 @@ export default class Agent {
                 step: step,
                 state: this.state,
                 action: action,
-                nextState: nextState,
                 reward: reward,
                 totalReward: this.totalReward
             });

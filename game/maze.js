@@ -24,7 +24,7 @@ export async function start(file) {
         learningRate: 0.6,
         discountFactor: 0.7
     });
-    const policy = qlearningPolicy;
+    const policy = sarsaPolicy;
     agent.follow(policy);
     agent.setLimit(500);
     const initialState = new MazeState(1, 1);
