@@ -24,24 +24,25 @@ export async function start(file) {
         learningRate: 0.6,
         discountFactor: 0.7
     });
-    agent.follow(qlearningPolicy);
+    const policy = qlearningPolicy;
+    agent.follow(policy);
     agent.setLimit(500);
     const initialState = new MazeState(1, 1);
     const episodes = 1000;
 
-    qlearningPolicy.greedyRate = 1;
+    policy.greedyRate = 1;
     for (let episode = 0; episode < episodes / 10; episode++) {
         agent.reset(initialState);
         await agent.run().then(res => console.log(res.totalReward));
     }
 
-    qlearningPolicy.greedyRate = 0.3;
+    policy.greedyRate = 0.3;
     for (let episode = episodes / 10; episode < episodes; episode++) {
         agent.reset(initialState);
         await agent.run().then(res => console.log(res.totalReward));
     }
 
-    qlearningPolicy.greedyRate = 0;
+    policy.greedyRate = 0;
     agent.reset(initialState);
     await agent.run().then(console.log);
 
