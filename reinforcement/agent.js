@@ -9,6 +9,10 @@ export default class Agent {
         this.policy = policy;
     }
 
+    getPolicy() {
+        return this.policy;
+    }
+
     // return { nextState, reward }
     act(action) {
         return this.environment.response(this.state, action);

@@ -27,9 +27,10 @@ export function start(file) {
     });
     agent.follow(qlearningPolicy);
     agent.setLimit(100);
-    for (let episode = 0; episode < 200; episode++) {
+    for (let episode = 0; episode < 50; episode++) {
         agent.reset(new MazeState(1, 1));
         agent.run().then(console.log);
+        agent.getPolicy().save({ filePath: `.res/maze/policy${episode}.json` });
     }
     console.log(maze.text);
 };

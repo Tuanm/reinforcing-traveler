@@ -1,6 +1,7 @@
 import { Policy } from './../../../reinforcement/base';
 import { NotImplementedError, UnknownValueError } from './../../../reinforcement/error';
 import { MazeAction, MazeState } from './environment';
+import fs from 'fs';
 
 class StateActionPair {
     constructor(state, action) {
@@ -107,7 +108,17 @@ class TDPolicy extends Policy {
         if (this.learningRate === undefined || this.discountFactor === undefined) {
             throw new UnknownValueError(this.config);
         }
+        this.setValues(new Map()); // v/q: overriding needed
+        this.setPolicy(new StateMap()); // pi: state -> action
         this.visitedStates = new StateSet(); // contains visited states
+    }
+
+    setValues(values) {
+        this.values = values;
+    }
+
+    setPolicy(policy) {
+        this.policy = policy;
     }
 
     initializeValuesOnFirstVisit(state) {
@@ -121,13 +132,16 @@ class TDPolicy extends Policy {
     isValid(nextState) {
         return nextState.description !== MazeState.WALL;
     }
+
+    save(config) {
+        fs.writeFileSync(config?.filePath, JSON.stringify(this));
+    }
 }
 
 class OneStepTDPolicy extends TDPolicy {
     constructor(actions, config) {
         super(actions, config);
-        this.values = new StateMap(0); // state -> numeric value
-        this.policy = new StateMap(); // state -> action
+        super.setValues(new StateMap(0)); // v: state -> numeric value
     }
 
     initializeValuesOnFirstVisit(state) {
@@ -195,8 +209,7 @@ class OneStepTDPolicy extends TDPolicy {
 class SARSAPolicy extends TDPolicy {
     constructor(actions, config) {
         super(actions, config);
-        this.values = new StateActionPairMap(0); // (state, action) -> numeric value
-        this.policy = new StateMap(); // state -> action
+        super.setValues(new StateActionPairMap(0)); // q: (state, action) -> numeric value
     }
 
     initializeValuesOnFirstVisit(state) {
@@ -251,8 +264,7 @@ class SARSAPolicy extends TDPolicy {
 class QLearningPolicy extends TDPolicy {
     constructor(actions, config) {
         super(actions, config);
-        this.values = new StateActionPairMap(0); // (state, action) -> numeric value
-        this.policy = new StateMap(0); // state -> action
+        super.setValues(new StateActionPairMap(0)); // q: (state, action) -> numeric value
     }
 
     initializeValuesOnFirstVisit(state) {

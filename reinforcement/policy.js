@@ -30,4 +30,8 @@ export default class Policy {
     save(config) {
         throw new NotImplementedError(this.save);
     }
+
+    load(config) {
+        throw new NotImplementedError(this.load);
+    }
 }
