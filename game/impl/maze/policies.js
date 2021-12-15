@@ -104,13 +104,23 @@ class TDPolicy extends Policy {
         this.actions = actions;
         this.learningRate = config?.learningRate; // alpha in (0, 1]
         this.discountFactor = config?.discountFactor; // gamma in [0, 1]
-        this.greedyRate = config?.greedyRate; // epsilon in [0, 1)
+        this.explorationRate = config?.explorationRate; // epsilon in [0, 1)
         if (this.learningRate === undefined || this.discountFactor === undefined) {
             throw new UnknownValueError(this.config);
         }
         this.setValues(new Map()); // v/q: overriding needed
         this.setPolicy(new StateMap()); // pi: state -> action
         this.visitedStates = new StateSet(); // contains visited states
+    }
+
+    // return an action
+    tryExplore(nextState) {
+        if (nextState === undefined || (
+            this.explorationRate != undefined && Math.random() < this.explorationRate
+        )) {
+            return this.actions[Math.floor(Math.random() * this.actions.length)];
+        }
+        return undefined; // not explore
     }
 
     setValues(values) {
@@ -130,7 +140,7 @@ class TDPolicy extends Policy {
     }
 
     isValid(nextState) {
-        return nextState.description !== MazeState.WALL;
+        return nextState?.description !== MazeState.WALL;
     }
 
     save(config) {
@@ -150,11 +160,8 @@ class OneStepTDPolicy extends TDPolicy {
 
     // return an action
     takeActionByPolicy(nextState) {
-        if (nextState === undefined || (
-            this.greedyRate != undefined && Math.random() < this.greedyRate
-        )) {
-            return this.actions[Math.floor(Math.random() * this.actions.length)];
-        }
+        const explorationAction = this.tryExplore(nextState);
+        if (explorationAction !== undefined) return explorationAction;
 
         const possibleWays = [
             {
@@ -203,7 +210,7 @@ class OneStepTDPolicy extends TDPolicy {
             this.values.set(state, currentStateValue + this.learningRate * tdError);
         }
         return this.takeActionByPolicy(
-            nextState?.description === MazeState.WALL ? state : nextState
+            this.isValid(nextState) ? state : nextState
         );
     }
 }
@@ -223,11 +230,8 @@ class SARSAPolicy extends TDPolicy {
 
     // return an action
     takeActionByPolicy(nextState) {
-        if (nextState === undefined || (
-            this.greedyRate != undefined && Math.random() < this.greedyRate
-        )) {
-            return this.actions[Math.floor(Math.random() * this.actions.length)];
-        }
+        const explorationAction = this.tryExplore(nextState);
+        if (explorationAction !== undefined) return explorationAction;
 
         const nextActions = [];
         let maxValue = -Infinity;
@@ -246,7 +250,7 @@ class SARSAPolicy extends TDPolicy {
 
     dicide(state, action, reward, nextState) { // return an action
         const nextAction = this.takeActionByPolicy(
-            nextState?.description === MazeState.WALL ? state : nextState
+            this.isValid(nextState) ? state : nextState
         );
         if (state !== undefined && reward !== undefined) {
             if (!this.visitedStates.has(state)) {
@@ -280,11 +284,8 @@ class QLearningPolicy extends TDPolicy {
 
     // return an action
     takeActionByPolicy(nextState) {
-        if (nextState === undefined || (
-            this.greedyRate != undefined && Math.random() < this.greedyRate
-        )) {
-            return this.actions[Math.floor(Math.random() * this.actions.length)];
-        }
+        const explorationAction = this.tryExplore(nextState);
+        if (explorationAction !== undefined) return explorationAction;
 
         const nextActions = [];
         let maxValue = -Infinity;
@@ -324,7 +325,7 @@ class QLearningPolicy extends TDPolicy {
             ));
         }
         return this.takeActionByPolicy(
-            nextState?.description === MazeState.WALL ? state : nextState
+            this.isValid(nextState) ? state : nextState
         );
     }
 }
