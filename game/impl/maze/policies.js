@@ -10,7 +10,7 @@ class StateActionPair {
     }
 
     equals(other) {
-        return this.state === other?.state
+        return this.state.equals(other?.state)
             && this.action === other?.action;
     }
 }
@@ -32,15 +32,13 @@ class StateActionPairMap extends Map {
 
     set(stateActionPair, value) {
         if (value === undefined) value = this.defaultValue;
-        let foundKey;
         for (const key of super.keys()) {
             if (key?.equals(stateActionPair)) {
-                foundKey = key;
-                break;
+                super.set(key, value);
+                return;
             }
         }
-        if (foundKey !== undefined) super.set(foundKey, value);
-        else super.set(stateActionPair, value);
+        super.set(stateActionPair, value);
     }
 
     setDefault(defaultValue) {
@@ -65,15 +63,13 @@ class StateMap extends Map {
 
     set(state, value) {
         if (value === undefined) value = this.defaultValue;
-        let foundKey;
         for (const key of super.keys()) {
             if (key?.equals(state)) {
-                foundKey = key;
-                break;
+                super.set(key, value);
+                return;
             }
         }
-        if (foundKey !== undefined) super.set(foundKey, value);
-        else super.set(stateActionPair, value);
+        super.set(stateActionPair, value);
     }
 
     setDefault(defaultValue) {
@@ -108,8 +104,7 @@ class TDPolicy extends Policy {
         if (this.learningRate === undefined || this.discountFactor === undefined) {
             throw new UnknownValueError(this.config);
         }
-        this.setValues(new Map()); // v/q: overriding needed
-        this.setPolicy(new StateMap()); // pi: state -> action
+        this.setValues(undefined); // v/q: overriding needed
         this.visitedStates = new StateSet(); // contains visited states
     }
 
@@ -125,10 +120,6 @@ class TDPolicy extends Policy {
 
     setValues(values) {
         this.values = values;
-    }
-
-    setPolicy(policy) {
-        this.policy = policy;
     }
 
     initializeValuesOnFirstVisit(state) {
@@ -234,7 +225,7 @@ class SARSAPolicy extends TDPolicy {
         if (explorationAction !== undefined) return explorationAction;
 
         const nextActions = [];
-        let maxValue = -Infinity;
+        let maxValue = this.values.defaultValue;
         for (const stateActionPair of this.values.keys()) {
             if (stateActionPair.state.equals(nextState)) {
                 if (this.values.get(stateActionPair) >= maxValue) {
@@ -291,8 +282,9 @@ class QLearningPolicy extends TDPolicy {
         let maxValue = -Infinity;
         for (const stateActionPair of this.values.keys()) {
             if (stateActionPair.state.equals(nextState)) {
-                if (this.values.get(stateActionPair) >= maxValue) {
-                    maxValue = this.values.get(stateActionPair);
+                const value = this.values.get(stateActionPair);
+                if (value >= maxValue) {
+                    maxValue = value;
                     nextActions.push(stateActionPair.action);
                 }
             }
@@ -308,7 +300,7 @@ class QLearningPolicy extends TDPolicy {
                 this.initializeValuesOnFirstVisit(state);
             }
             const currentValue = this.values.get(new StateActionPair(state, action));
-            let maxValue = -Infinity;
+            let maxValue = this.values.defaultValue;
             for (const stateActionPair of this.values.keys()) {
                 if (stateActionPair.state.equals(nextState)) {
                     if (this.values.get(stateActionPair) >= maxValue) {

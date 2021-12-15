@@ -23,4 +23,9 @@ export default class Environment {
     response(state, action) {
         throw new NotImplementedError(this.response);
     }
-};
+
+    // return a random state
+    getRandomState() {
+        throw new NotImplementedError(this.getRandomState);
+    }
+}

@@ -81,13 +81,13 @@ class Maze extends Environment {
                 const state = this.states[x][y];
                 switch (state.description) {
                     case MazeState.OTHER:
-                        reward = 0;
+                        reward = +0;
                         break;
                     case MazeState.WALL:
                         reward = -5;
                         break;
                     case MazeState.GOAL:
-                        reward = 10;
+                        reward = +10;
                         break;
                 }
                 row.push({
@@ -111,6 +111,15 @@ class Maze extends Environment {
         };
     }
 
+    getRandomState() {
+        while (true) {
+            const x = Math.floor(Math.random() * this.height);
+            const y = Math.floor(Math.random() * this.width);
+            const state = this.states[x][y];
+            if (state.description === MazeState.OTHER) return state;
+        }
+    }
+
     getNextState(state, action) {
         let x = state?.x;
         let y = state?.y;
@@ -130,8 +139,7 @@ class Maze extends Environment {
             default:
                 throw new UnknownValueError(state);
         }
-        const nextState = this.states[x][y];
-        return nextState;
+        return this.states[x][y];
     }
 
     getReward(newState) {
