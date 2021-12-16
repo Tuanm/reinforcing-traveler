@@ -1,3 +1,18 @@
+button {
+    margin-top: 5px;
+    margin-bottom: 5px;
+    cursor: pointer;
+}
+
+input {
+    margin-top: 5px;
+    margin-bottom: 5px;
+}
+
+.container {
+    margin: 20px;
+}
+
 .game-board {
     display: inline-block;
     margin: 20px;
@@ -11,18 +26,15 @@
     display: inline-block;
     width: 32px;
     height: 32px;
-    background-color: gray;
     cursor: pointer;
 }
 
 .game-reward {
     margin: 20px;
-    font-size: 200%;
 }
 
 .game-action {
     margin: 20px;
-    font-size: 200%;
 }
 
 .game-values {

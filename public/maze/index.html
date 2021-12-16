@@ -3,24 +3,41 @@
     <link rel="stylesheet" href="/maze/style.css">
 </head>
 <body>
-    <h2>A-maze game!</h2>
-    <div>
+    <div class="container">
+        <h2>A-maze game!</h2>
+    </div>
+    <div class="container">
+        <div>
+            <textarea id="map" cols="40" rows="10" placeholder="The maze will be changed here..."></textarea>
+        </div>
+        <button id="map-modify-button">Modify</button>
+    </div>
+    <div class="container">
         <div>
             <input type="number" id="learning-rate-input" placeholder="Learning rate" title="Alpha"/>
             <input type="number" id="discount-factor-input" placeholder="Discount Factor" title="Gamma"/>
             <input type="number" id="exploration-rate-input" placeholder="Exploration Rate" title="Epsilon"/>
         </div>
         <div>
-            <input type="number" id="max-steps-input" placeholder="Steps"/>
-            <input type="number" id="step-speed-input" placeholder="Speed"/>
+            <input type="number" id="max-steps-input" placeholder="Steps" title="Maximum Steps"/>
+            <input type="number" id="step-speed-input" placeholder="Speed" title="In Millisecond"/>
         </div>
         <button id="start-button">Start</button>
     </div>
-    <div class="game-board" id="game-states"></div>
-    <div class="game-board">
-        <div>Total Reward: <span class="game-reward" id="total-reward">0</span></div>
-        <div>Next Action: <span class="game-action" id="next-action">UNKNOWN</span></div>
+    <div class="container">
+        <table>
+            <caption hidden>Game Step</caption>
+            <tr>
+                <th scope="row">Total Reward</th>
+                <td><span class="game-reward" id="total-reward">0</span></td>
+            </tr>
+            <tr>
+                <th scope="row">Next Action</th>
+                <td><span class="game-action" id="next-action">?</span></td>
+            </tr>
+        </table>
     </div>
+    <div class="game-board" id="game-states"></div>
     <div class="game-values" id="game-values" title="Click to hide!">
         <div class="game-board-row">
             <div class="game-value"></div>

@@ -1,14 +1,13 @@
 import { Agent } from './../reinforcement/base';
-import { Maze, MazeState } from './impl/maze/environment';
+import { Maze } from './impl/maze/environment';
 import { SARSAPolicy, QLearningPolicy } from './impl/maze/policies';
 import fs from 'fs';
 
 
-export function getGameInfo(file) {
-    if (!file) {
-        file = 'data/maze.txt'; // default
+export function getGameInfo(text) {
+    if (!text) {
+        text = fs.readFileSync('data/maze.txt', 'utf-8'); // default
     }
-    const text = fs.readFileSync(file, 'utf-8');
     const maze = new Maze(text);
     const agent = new Agent(maze);
     const policyConfig = {

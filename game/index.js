@@ -17,10 +17,8 @@ export function setSocketServer(server) {
     socketServer.on('connection', (socket) => {
 
         const id = socket.id;
-        const game = getGameInfo();
-        const environment = game.environment.instance;
-        const agent = game.agent;
-        
+
+        let game = getGameInfo();
         let isRunning = false; // for checking if game has been started or not
         let stopForced = false; // for checking if game has been stopped or not
 
@@ -37,8 +35,14 @@ export function setSocketServer(server) {
             socket.emit('history-fetched', history);
         });
 
-        socket.on('fetch-game', (file) => {
+        socket.on('fetch-game', () => {
+            game = getGameInfo();
             socket.emit('game-fetched', game); // Fetch game's information.
+        });
+
+        socket.on('change-map', (text) => {
+            game = getGameInfo(text);
+            socket.emit('map-changed', game); // Change game's information.
         });
 
         socket.on('start-game', async (settings) => {
@@ -46,6 +50,8 @@ export function setSocketServer(server) {
             console.log('game started');
             isRunning = true;
             console.log(settings);
+            const environment = game.environment.instance;
+            const agent = game.agent;
             const policy = game.policies[settings.policyNumber];
             policy.learningRate = settings.learningRate;
             policy.discountFactor = settings.discountFactor;

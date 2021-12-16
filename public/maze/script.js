@@ -1,4 +1,6 @@
 const startButton = document.getElementById('start-button');
+const mapModifyButton = document.getElementById('map-modify-button');
+const mapInput = document.getElementById('map');
 const stepSpeedInput = document.getElementById('step-speed-input');
 const learningRateInput = document.getElementById('learning-rate-input');
 const discountFactorInput = document.getElementById('discount-factor-input');
@@ -14,26 +16,26 @@ const actionRightValueSpanner = document.getElementById('action-right-value');
 const actionDownValueSpanner = document.getElementById('action-down-value');
 
 
-function createGameBoardRow() {
-    const gameBoardRow = document.createElement('div');
-    gameBoardRow.className = 'game-board-row';
-    return gameBoardRow;
-}
-
 function createGameState(state) {
-    const div = document.createElement('div');
-    div.className = 'game-state';
-    div.title = `(${state.x}, ${state.y})`;
+    const gameState = document.createElement('div');
+    gameState.title = `[${state.x}, ${state.y}]`;
+    gameState.className = 'game-state';
     if (state.description === 'W') {
-        div.style.backgroundColor = 'black';
+        gameState.style.backgroundColor = 'black';
     }
     else if (state.description === 'G') {
-        div.style.backgroundColor = 'green';
+        gameState.style.backgroundColor = 'green';
     }
     else {
-        div.style.backgroundColor = 'gray';
+        gameState.style.backgroundColor = 'gray';
+        gameState.onmouseover = function () {
+            gameState.style.backgroundColor = 'white';
+        };
+        gameState.onmouseleave = function () {
+            gameState.style.backgroundColor = 'gray';
+        };
     }
-    return div;
+    return gameState;
 }
 
 function setGameValues(state, policyValues) {
@@ -56,10 +58,10 @@ function setGameValues(state, policyValues) {
             }
         }
     }
-    actionUpValueSpanner.innerText = gameValues.up;
-    actionLeftValueSpanner.innerText = gameValues.left;
-    actionRightValueSpanner.innerText = gameValues.right;
-    actionDownValueSpanner.innerText = gameValues.down;
+    actionUpValueSpanner.innerText = gameValues.up !== undefined ? gameValues.up : '';
+    actionLeftValueSpanner.innerText = gameValues.left !== undefined ? gameValues.left : '';
+    actionRightValueSpanner.innerText = gameValues.right !== undefined ? gameValues.right : '';
+    actionDownValueSpanner.innerText = gameValues.down !== undefined ? gameValues.down : '';
 }
 
 function peekGameStateValues(state, policyValues) {
@@ -74,14 +76,15 @@ function peekGameStateValues(state, policyValues) {
 function visualizeGameStates(states, currentState, policyValues) {
     gameStatesContainer.innerHTML = ''; // remove all child nodes
     for (const stateRow of states) {
-        const gameBoardRow = createGameBoardRow();
+        const gameBoardRow = document.createElement('div');
+        gameBoardRow.className = 'game-board-row';
         for (const state of stateRow) {
             const gameState = createGameState(state);
             gameState.onclick = function () {
                 peekGameStateValues(state, policyValues);
             };
             if (state.x == currentState?.x && state.y == currentState?.y) {
-                gameState.style.backgroundColor = 'red';
+                gameState.style.backgroundColor = 'yellow'; // highlight current state
             }
             gameBoardRow.appendChild(gameState);
         }
@@ -97,10 +100,17 @@ function init() {
     let states;
 
     that.on('connected', function () {
-        that.emit('fetch-game', undefined);
+        const mapText = localStorage.getItem('map');
+        if (!mapText) {
+            that.emit('fetch-game'); // fetch map from server
+        }
+        else {
+            that.emit('change-map', mapText);
+        }
     });
 
     that.on('game-fetched', function (gameInfo) {
+        mapInput.value = gameInfo.environment.instance.text;
         states = gameInfo.environment.states;
         console.log(gameInfo);
         visualizeGameStates(states);
@@ -120,6 +130,13 @@ function init() {
             console.log('game finished');
         }
     });
+
+    that.on('map-changed', function (gameInfo) {
+        states = gameInfo.environment.states;
+        console.log(gameInfo);
+        visualizeGameStates(states);
+        console.log('map changed');
+    })
 }
 
 function start() {
@@ -136,6 +153,10 @@ function start() {
     console.log('game started');
 }
 
+function updateStartButton() {
+    startButton.textContent = !that.running ? 'Start' : 'Stop';
+}
+
 function stop() {
     that.emit('stop-game');
     that.running = false;
@@ -143,8 +164,11 @@ function stop() {
     console.log('game stopped');
 }
 
-function updateStartButton() {
-    startButton.textContent = !that.running ? 'Start' : 'Stop';
+function modify() {
+    const mapText = mapInput.value.replaceAll('\n', '\r\n').toUpperCase();
+    localStorage.setItem('map', mapText);
+    console.log('map saved in local storage');
+    that.emit('change-map', mapText);
 }
 
 window.onload = init;
@@ -153,6 +177,10 @@ startButton.onclick = function () {
     if (!that.running) start();
     else stop();
 };
+
+mapModifyButton.onclick = function () {
+    modify();
+}
 
 gameValuesPopup.onclick = function () {
     gameValuesPopup.style.visibility = 'hidden';
