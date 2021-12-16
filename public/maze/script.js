@@ -3,6 +3,8 @@ console.log('I am still working on https://github.com/Tuanm/tuanlearning');
 console.log('Your contribution is always welcome!');
 
 
+let debug = false; // change it as `true` to see the logs
+
 const startButton = document.getElementById('start-button');
 const mapModifyButton = document.getElementById('map-modify-button');
 const mapInput = document.getElementById('map');
@@ -120,7 +122,7 @@ function init() {
         states = gameInfo.environment.states;
         console.log(gameInfo);
         visualizeGameStates(states);
-        console.log('game fetched');
+        if (debug) console.log('game fetched');
     });
 
     that.on('game-step-fetched', function (gameStepInfo) {
@@ -129,11 +131,11 @@ function init() {
         visualizeGameStates(states, currentState, policyValues);
         nextActionSpanner.textContent = gameStepInfo.gameStep.action;
         totalRewardSpanner.textContent = gameStepInfo.gameStep.totalReward;
-        console.log(gameStepInfo);
+        if (debug) console.log(gameStepInfo);
         if (gameStepInfo.gameFinished === true) {
             that.running = false;
             updateStartButton();
-            console.log('game finished');
+            if (debug) console.log('game finished');
         }
     });
 
@@ -141,7 +143,7 @@ function init() {
         states = gameInfo.environment.states;
         console.log(gameInfo);
         visualizeGameStates(states);
-        console.log('map changed');
+        if (debug) console.log('map changed');
     })
 }
 
@@ -155,13 +157,13 @@ function start() {
         explorationRate: explorationRateInput.value || 0.1,
         stepSpeed: stepSpeedInput.value || 1000, // default: 1 second
         initialState: {
-            x: initState[0].trim(),
-            y: initState[1].trim()
+            x: initState[0]?.trim(),
+            y: initState[1]?.trim()
         }
     });
     that.running = true;
     updateStartButton();
-    console.log('game started');
+    if (debug) console.log('game started');
 }
 
 function updateStartButton() {
@@ -172,13 +174,13 @@ function stop() {
     that.emit('stop-game');
     that.running = false;
     updateStartButton();
-    console.log('game stopped');
+    if (debug) console.log('game stopped');
 }
 
 function modify() {
     const mapText = mapInput.value.replaceAll('\n', '\r\n').toUpperCase();
     localStorage.setItem('map', mapText);
-    console.log('map saved in local storage');
+    if (debug) console.log('map saved in local storage');
     that.emit('change-map', mapText);
 }
 
