@@ -99,6 +99,19 @@ class Maze extends Environment {
         }
     }
 
+    getTerminalStates() {
+        const goalStates = [];
+        for (let x = 0; x < this.height; x++) {
+            for (let y = 0; y < this.width; y++) {
+                const state = this.states[x][y];
+                if (state.description === MazeState.GOAL) {
+                    goalStates.push(state);
+                }
+            }
+        }
+        return goalStates;
+    }
+
     response(state, action) {
         const newState = this.getNextState(state, action);
         const reward = this.getReward(newState);

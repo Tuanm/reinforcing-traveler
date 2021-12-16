@@ -13,12 +13,10 @@ export default class Agent {
         return this.policy;
     }
 
-    // return { nextState, reward }
     act(action) {
         return this.environment.response(this.state, action);
     }
 
-    // return an action
     getNextAction(action, reward, nextState) {
         return this.policy.dicide(this.state, action, reward, nextState);
     }
@@ -34,9 +32,8 @@ export default class Agent {
         this.totalReward = 0;
     }
 
-    // max steps
     setLimit(limit) {
-        this.limit = limit;
+        this.limit = limit; // max steps per episode
     }
 
     async run(goalState, log) {
@@ -49,7 +46,7 @@ export default class Agent {
         while (true) {
             let response;
             try {
-                response = this.act(action)
+                response = this.act(action); // receive nextState, reward for the action
                 actions.push(action);
             } catch (err) { // if enviroment throws a TerminalStateError
                 const terminalReward = err?.reward;
@@ -60,13 +57,18 @@ export default class Agent {
             const nextState = response?.nextState;
             const reward = response?.reward;
             if (reward !== undefined) this.totalReward += reward;
-            if (log) await log({
-                step: step,
-                state: this.state,
-                action: action,
-                reward: reward,
-                totalReward: this.totalReward
-            });
+            try {
+                if (log) await log({
+                    step: step,
+                    state: this.state,
+                    action: action,
+                    reward: reward,
+                    totalReward: this.totalReward
+                });
+            } catch (err) { // error when running function `log`
+                console.log(err?.message);
+                break;
+            }
             if (isTerminated || nextState?.equals(goalState)) break;
             action = this.getNextAction(action, reward, nextState);
             this.updateState(nextState);
@@ -81,4 +83,4 @@ export default class Agent {
             goalReached: goalReached
         };
     }
-};
+}

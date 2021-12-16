@@ -19,13 +19,11 @@ export default class Environment {
         this.rewards = rewards;
     }
 
-    // return { nextState, reward }
     response(state, action) {
-        throw new NotImplementedError(this.response);
+        throw new NotImplementedError(this.response); // must return nextState and reward
     }
 
-    // return a random state
     getRandomState() {
-        throw new NotImplementedError(this.getRandomState);
+        throw new NotImplementedError(this.getRandomState); // must return a random state
     }
 }

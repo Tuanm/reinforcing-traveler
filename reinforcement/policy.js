@@ -24,7 +24,7 @@ export default class Policy {
 
     dicide(state, action, reward, nextState) {
         if (this.dicision) return this.dicision(state, action, reward, nextState);
-        throw new NotImplementedError(this.dicide);
+        throw new NotImplementedError(this.dicide); // must return an action
     }
 
     save(config) {

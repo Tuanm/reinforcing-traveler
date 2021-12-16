@@ -1,7 +1,6 @@
 import { Policy } from './../../../reinforcement/base';
 import { NotImplementedError, UnknownValueError } from './../../../reinforcement/error';
 import { MazeAction, MazeState } from './environment';
-import fs from 'fs';
 
 class StateActionPair {
     constructor(state, action) {
@@ -108,8 +107,7 @@ class TDPolicy extends Policy {
         this.visitedStates = new StateSet(); // contains visited states
     }
 
-    // return an action
-    tryExplore(nextState) {
+    tryExplore(nextState) { // return an action
         if (nextState === undefined || (
             this.explorationRate != undefined && Math.random() < this.explorationRate
         )) {
@@ -120,6 +118,14 @@ class TDPolicy extends Policy {
 
     setValues(values) {
         this.values = values;
+    }
+
+    getValues() {
+        const copiedValues = [];
+        for (const entry of this.values.entries()) {
+            copiedValues.push(entry);
+        }
+        return copiedValues;
     }
 
     initializeValuesOnFirstVisit(state) {
@@ -133,10 +139,6 @@ class TDPolicy extends Policy {
     isValid(nextState) {
         return nextState?.description !== MazeState.WALL;
     }
-
-    save(config) {
-        fs.writeFileSync(config?.filePath, JSON.stringify(this));
-    }
 }
 
 class OneStepTDPolicy extends TDPolicy {
@@ -149,7 +151,6 @@ class OneStepTDPolicy extends TDPolicy {
         this.visitedStates.add(state);
     }
 
-    // return an action
     takeActionByPolicy(nextState) {
         const explorationAction = this.tryExplore(nextState);
         if (explorationAction !== undefined) return explorationAction;
@@ -279,7 +280,6 @@ class QLearningPolicy extends TDPolicy {
         }
     }
 
-    // return an action
     takeActionByPolicy(nextState) {
         const explorationAction = this.tryExplore(nextState);
         if (explorationAction !== undefined) return explorationAction;
