@@ -1,0 +1,34 @@
+.game-board {
+    display: inline-block;
+    margin: 20px;
+}
+
+.game-board-row {
+    display: block;
+}
+
+.game-state {
+    display: inline-block;
+    width: 32px;
+    height: 32px;
+    background-color: gray;
+    border: 1px solid;
+}
+
+.game-state:hover {
+    border: 1px solid yellow;
+}
+
+.game-reward {
+    margin: 20px;
+    font-size: 200%;
+}
+
+.game-action {
+    margin: 20px;
+    font-size: 200%;
+}
+
+.game-value {
+    display: inline-block;
+}

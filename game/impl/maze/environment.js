@@ -34,7 +34,7 @@ class Maze extends Environment {
 
     initializeMazeFromText(text) {
         const maze = [];
-        const lines = text.split('\n');
+        const lines = text.split('\r\n');
         for (const line of lines) {
             const row = [];
             const values = line.split(' ');
@@ -116,7 +116,7 @@ class Maze extends Environment {
         const newState = this.getNextState(state, action);
         const reward = this.getReward(newState);
         if (newState.description === MazeState.GOAL) {
-            throw new TerminalStateError(reward, true);
+            throw new TerminalStateError(newState, reward, true);
         }
         return {
             nextState: newState,

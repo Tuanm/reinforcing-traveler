@@ -1,9 +1,9 @@
 <head>
-    <title>Maze</title>
+    <title>A-maze game!</title>
     <link rel="stylesheet" href="/maze/style.css">
 </head>
 <body>
-    <div>Open tab Console!</div>
+    <h2>A-maze game!</h2>
     <div>
         <div>
             <input type="number" id="learning-rate-input" placeholder="Alpha"/>
@@ -16,6 +16,12 @@
         </div>
         <button id="start-button">Start</button>
     </div>
+    <div class="game-board" id="game-states"></div>
+    <div class="game-board">
+        <div>Total Reward: <span class="game-reward" id="total-reward">0</span></div>
+        <div>Next Action: <span class="game-action" id="next-action">UNKNOWN</span></div>
+    </div>
+    <div class="game-board" id="game-values"></div>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/3.1.3/socket.io.min.js"></script>
     <script src="/maze/script.js"></script>
 </body>

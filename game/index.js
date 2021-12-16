@@ -43,6 +43,7 @@ export function setSocketServer(server) {
 
         socket.on('start-game', async (settings) => {
             if (isRunning) return;
+            console.log('game started');
             isRunning = true;
             console.log(settings);
             const policy = game.policies[settings.policyNumber];
@@ -52,12 +53,11 @@ export function setSocketServer(server) {
             agent.setLimit(settings.maxSteps);
             agent.follow(policy);
             agent.reset(environment.getRandomState());
-            const result = await agent.run(undefined, async (info) => {
+            const result = await agent.run(undefined, async (gameStep) => {
                 socket.emit('game-step-fetched', {
-                    gameStep: info,
+                    gameStep: gameStep,
                     policyValues: policy.getValues()
                 });
-                console.log(info.totalReward);
                 await sleep(settings.stepSpeed);
                 if (socket.disconnected) {
                     throw new Error('socket disconnected');
@@ -67,9 +67,20 @@ export function setSocketServer(server) {
                     throw new Error('game stopped');
                 }
             });
-            console.log(result);
+            const finalGameStepInfo = {
+                gameStep: {
+                    state: result.states[result.states.length - 1],
+                    action: result.actions[result.actions.length - 1],
+                    reward: result.rewards[result.rewards.length - 1],
+                    totalReward: result.totalReward
+                },
+                policyValues: policy.getValues(),
+                gameFinished: true
+            };
+            socket.emit('game-step-fetched', finalGameStepInfo);
             game.policies[settings.policyNumber] = policy; // update policy
             isRunning = false;
+            console.log('game finished');
         });
 
         socket.on('stop-game', () => {

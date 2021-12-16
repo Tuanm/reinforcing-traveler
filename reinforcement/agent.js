@@ -25,6 +25,7 @@ export default class Agent {
         if (this.policy.isValid(nextState)) {
             this.state = nextState;
         }
+        return this.state;
     }
 
     reset(initialState) {
@@ -39,6 +40,7 @@ export default class Agent {
     async run(goalState, log) {
         const actions = [];
         const states = [this.state];
+        const rewards = [];
         let action = this.getNextAction();
         let step = 0;
         let isTerminated = false;
@@ -49,36 +51,45 @@ export default class Agent {
                 response = this.act(action); // receive nextState, reward for the action
                 actions.push(action);
             } catch (err) { // if enviroment throws a TerminalStateError
-                const terminalReward = err?.reward;
+                response = {
+                    nextState: err?.state,
+                    reward: err?.reward
+                };
                 goalReached = err?.goalReached;
-                if (terminalReward !== undefined) this.totalReward += terminalReward;
                 isTerminated = true;
             }
             const nextState = response?.nextState;
             const reward = response?.reward;
-            if (reward !== undefined) this.totalReward += reward;
+            if (reward !== undefined) {
+                rewards.push(reward);
+                this.totalReward += reward;
+            }
             try {
                 if (log) await log({
                     step: step,
                     state: this.state,
                     action: action,
                     reward: reward,
+                    responseState: nextState,
                     totalReward: this.totalReward
                 });
             } catch (err) { // error when running function `log`
                 console.log(err?.message);
                 break;
             }
-            if (isTerminated || nextState?.equals(goalState)) break;
+            if (isTerminated || nextState?.equals(goalState)) {
+                states.push(this.updateState(nextState));
+                break;
+            }
             action = this.getNextAction(action, reward, nextState);
-            this.updateState(nextState);
-            states.push(this.state);
+            states.push(this.updateState(nextState));
             step++;
             if (this.limit !== undefined && step >= this.limit) break;
         }
         return {
             actions: actions,
             states: states,
+            rewards: rewards,
             totalReward: this.totalReward,
             goalReached: goalReached
         };
