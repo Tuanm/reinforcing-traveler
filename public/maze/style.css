@@ -12,11 +12,7 @@
     width: 32px;
     height: 32px;
     background-color: gray;
-    border: 1px solid;
-}
-
-.game-state:hover {
-    border: 1px solid yellow;
+    cursor: pointer;
 }
 
 .game-reward {
@@ -29,6 +25,22 @@
     font-size: 200%;
 }
 
+.game-values {
+    display: flex;
+    position: absolute;
+    width: 96px;
+    height: 96px;
+    background-color: rgba(0, 0, 0, 0.5);
+    visibility: hidden;
+    cursor: pointer;
+}
+
 .game-value {
     display: inline-block;
+    width: 32px;
+    height: 32px;
+    color: yellow;
+    cursor: pointer;
+    text-align: center;
+    overflow-x: hidden;
 }
