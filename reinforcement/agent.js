@@ -77,11 +77,11 @@ export default class Agent {
                 console.log(err?.message);
                 break;
             }
+            action = this.getNextAction(action, reward, nextState);
             if (isTerminated || nextState?.equals(goalState)) {
                 states.push(this.updateState(nextState));
                 break;
             }
-            action = this.getNextAction(action, reward, nextState);
             states.push(this.updateState(nextState));
             step++;
             if (this.limit !== undefined && step >= this.limit) break;

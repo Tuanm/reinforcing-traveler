@@ -133,6 +133,16 @@ class Maze extends Environment {
         }
     }
 
+    tryGetState(state) {
+        if (state !== undefined) {
+            const x = state.x || 0;
+            const y = state.y || 0;
+            const foundState = this.states[x][y];
+            if (foundState?.description === MazeState.OTHER) return foundState;
+        }
+        return this.getRandomState();
+    }
+
     getNextState(state, action) {
         let x = state?.x;
         let y = state?.y;

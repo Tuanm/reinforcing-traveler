@@ -1,3 +1,8 @@
+console.log('This is the small game for my academic project.');
+console.log('I am still working on https://github.com/Tuanm/tuanlearning');
+console.log('Your contribution is always welcome!');
+
+
 const startButton = document.getElementById('start-button');
 const mapModifyButton = document.getElementById('map-modify-button');
 const mapInput = document.getElementById('map');
@@ -46,7 +51,7 @@ function setGameValues(state, policyValues) {
         down: undefined
     };
     for (const values of policyValues) {
-        if (values[0].state.x === state.x && values[0].state.y) {
+        if (values[0].state.x === state.x && values[0].state.y === state.y) {
             if (values[0].action === 'UP') gameValues.up = values[1];
             else if (values[0].action === 'LEFT') gameValues.left = values[1];
             else if (values[0].action === 'RIGHT') gameValues.right = values[1];

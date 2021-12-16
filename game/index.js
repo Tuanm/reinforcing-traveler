@@ -58,7 +58,7 @@ export function setSocketServer(server) {
             policy.explorationRate = settings.explorationRate;
             agent.setLimit(settings.maxSteps);
             agent.follow(policy);
-            agent.reset(environment.getRandomState());
+            agent.reset(environment.tryGetState(settings?.initialState));
             const result = await agent.run(undefined, async (gameStep) => {
                 socket.emit('game-step-fetched', {
                     gameStep: gameStep,
