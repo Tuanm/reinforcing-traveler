@@ -120,7 +120,7 @@ function init() {
     that.on('game-fetched', function (gameInfo) {
         mapInput.value = gameInfo.environment.instance.text;
         states = gameInfo.environment.states;
-        console.log(gameInfo);
+        if (debug) console.log(gameInfo);
         visualizeGameStates(states);
         if (debug) console.log('game fetched');
     });
