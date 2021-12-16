@@ -11,6 +11,7 @@ const learningRateInput = document.getElementById('learning-rate-input');
 const discountFactorInput = document.getElementById('discount-factor-input');
 const explorationRateInput = document.getElementById('exploration-rate-input');
 const maxStepsInput = document.getElementById('max-steps-input');
+const initStateInput = document.getElementById('init-state-input');
 const gameStatesContainer = document.getElementById('game-states');
 const totalRewardSpanner = document.getElementById('total-reward');
 const nextActionSpanner = document.getElementById('next-action');
@@ -145,13 +146,18 @@ function init() {
 }
 
 function start() {
+    const initState = initStateInput.value.split(',');
     that.emit('start-game', {
         policyNumber: 1, // Q-learning
         maxSteps: maxStepsInput.value || 200,
         learningRate: learningRateInput.value || 0.5,
         discountFactor: discountFactorInput.value || 0.7,
         explorationRate: explorationRateInput.value || 0.1,
-        stepSpeed: stepSpeedInput.value || 1000 // default: 1 second
+        stepSpeed: stepSpeedInput.value || 1000, // default: 1 second
+        initialState: {
+            x: initState[0].trim(),
+            y: initState[1].trim()
+        }
     });
     that.running = true;
     updateStartButton();
