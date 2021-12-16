@@ -141,7 +141,7 @@ function init() {
 
     that.on('map-changed', function (gameInfo) {
         states = gameInfo.environment.states;
-        console.log(gameInfo);
+        if (debug) console.log(gameInfo);
         visualizeGameStates(states);
         if (debug) console.log('map changed');
     })
