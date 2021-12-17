@@ -5,7 +5,7 @@ console.log('Your contribution is always welcome!');
 
 let debug = false; // change it as `true` to see the logs
 
-window.onload = function () {
+(function () {
     const startButton = document.getElementById('start-button');
     const mapReloadButton = document.getElementById('map-reload-button');
     const mapInput = document.getElementById('map');
@@ -140,6 +140,15 @@ window.onload = function () {
     
     // socket client
     const that = io();
+
+    function updateMap(gameInfo) {
+        mapInput.value = gameInfo.environment.instance.text;
+        mapInput.value = mapText;
+        if (debug) console.log(gameInfo);
+        addGamePolicies(gameInfo.policies);
+        visualizeGameStates(states);
+        if (debug) console.log('map changed');
+    }
     
     function init() {
         let states;
@@ -154,14 +163,8 @@ window.onload = function () {
             }
         });
     
-        that.on('game-fetched', function (gameInfo) {
-            mapInput.value = gameInfo.environment.instance.text;
-            states = gameInfo.environment.states;
-            if (debug) console.log(gameInfo);
-            addGamePolicies(gameInfo.policies);
-            visualizeGameStates(states);
-            if (debug) console.log('game fetched');
-        });
+        that.on('game-fetched', updateMap);
+        that.on('map-changed', updateMap);
     
         that.on('game-step-fetched', function (gameStepInfo) {
             const currentState = gameStepInfo.gameStep.state;
@@ -176,14 +179,6 @@ window.onload = function () {
                 if (debug) console.log('game finished');
             }
         });
-    
-        that.on('map-changed', function (gameInfo) {
-            states = gameInfo.environment.states;
-            if (debug) console.log(gameInfo);
-            addGamePolicies(gameInfo.policies);
-            visualizeGameStates(states);
-            if (debug) console.log('map changed');
-        })
     }
     
     function close() {
@@ -254,5 +249,7 @@ window.onload = function () {
     };
 
     window.onbeforeunload = close;
-    init();
-};
+    window.onload = init;
+})();
+
+// TODO: Load saved policies
