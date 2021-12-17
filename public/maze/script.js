@@ -71,7 +71,7 @@ function setGameValues(state, policyValues) {
             let gameValue;
             if (!Number.isNaN(values[1])) {
                 gameValue = Number(values[1]);
-                gameValue = Math.round(gameValue * 100) / 100; // takes 2 digits after floating point
+                gameValue = Math.round(gameValue * 1e3) / 1e3; // takes 3 digits after floating point
             }
             if (values[0].action === 'UP') gameValues.up = gameValue;
             else if (values[0].action === 'LEFT') gameValues.left = gameValue;
@@ -194,12 +194,18 @@ function start() {
             break;
         }
     }
+    let learningRate = learningRateInput.valueAsNumber;
+    let discountFactor = discountFactorInput.valueAsNumber;
+    let explorationRate = explorationRateInput.valueAsNumber;
+    if (Number.isNaN(learningRate)) learningRate = 0.5;
+    if (Number.isNaN(discountFactor)) discountFactor = 0.7;
+    if (Number.isNaN(explorationRate)) explorationRate = 0.1;
     that.emit('start-game', {
-        policyNumber: policyOption.value || 1, // Q-learning
+        policyNumber: policyOption.value || 0,
         maxSteps: maxStepsInput.value || 200,
-        learningRate: learningRateInput.value || 0.5,
-        discountFactor: discountFactorInput.value || 0.7,
-        explorationRate: explorationRateInput.value || 0.1,
+        learningRate: learningRate,
+        discountFactor: discountFactor,
+        explorationRate: explorationRate,
         stepSpeed: stepSpeedInput.value || 1000, // default: 1 second
         initialState: {
             x: initState[0]?.trim(),
