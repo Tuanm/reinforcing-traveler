@@ -5,7 +5,7 @@ console.log('Your contribution is always welcome!');
 
 let debug = false; // change it as `true` to see the logs
 
-(function () {
+window.onload = function () {
     const startButton = document.getElementById('start-button');
     const mapReloadButton = document.getElementById('map-reload-button');
     const mapInput = document.getElementById('map');
@@ -240,9 +240,6 @@ let debug = false; // change it as `true` to see the logs
         that.emit('change-map', mapText);
     }
     
-    window.onload = init;
-    window.onbeforeunload = close;
-    
     startButton.onclick = function () {
         if (!that.running) start();
         else stop();
@@ -255,4 +252,7 @@ let debug = false; // change it as `true` to see the logs
     gameValuesPopup.onclick = function () {
         gameValuesPopup.style.visibility = 'hidden';
     };
-})();
+
+    window.onbeforeunload = close;
+    init();
+};
