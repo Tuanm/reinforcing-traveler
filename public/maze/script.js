@@ -143,6 +143,7 @@ let debug = false; // change it as `true` to see the logs
 
     function updateMap(gameInfo) {
         mapInput.value = gameInfo.environment.instance.text;
+        const states = gameInfo.environment.states;
         if (debug) console.log(gameInfo);
         addGamePolicies(gameInfo.policies);
         visualizeGameStates(states);
