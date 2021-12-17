@@ -163,8 +163,8 @@ let debug = false; // change it as `true` to see the logs
             }
         });
     
-        that.on('game-fetched', updateMap);
-        that.on('map-changed', updateMap);
+        that.on('game-fetched', (gameInfo) => updateMap(gameInfo));
+        that.on('map-changed', (gameInfo) => updateMap(gameInfo));
     
         that.on('game-step-fetched', function (gameStepInfo) {
             const currentState = gameStepInfo.gameStep.state;
