@@ -4,28 +4,39 @@
 </head>
 <body>
     <div class="container">
-        <h2>A-maze game!</h2>
+        <h1>A-maze game</h1>
     </div>
     <div class="container">
         <div>
             <textarea id="map" cols="40" rows="10" placeholder="The maze will be changed here..."></textarea>
         </div>
-        <button id="map-modify-button">Modify</button>
+        <div>
+            <textarea cols="40" rows="5" title="Available Symbols" readonly>
+                W = WALL [-5]
+                G = GOAL [+10]
+                - = OTHER [+0]
+                number = OTHER [number]
+            </textarea>
+        </div>
+        <button id="map-reload-button">Reload</button>
     </div>
     <div class="container">
         <div>
-            <input type="number" id="learning-rate-input" placeholder="Learning rate" title="Alpha"/>
-            <input type="number" id="discount-factor-input" placeholder="Discount Factor" title="Gamma"/>
-            <input type="number" id="exploration-rate-input" placeholder="Exploration Rate" title="Epsilon"/>
+            <input type="number" id="learning-rate-input" placeholder="Learning Rate" title="Alpha [Default: 0.5]" min="0" max="1"/>
+            <input type="number" id="discount-factor-input" placeholder="Discount Factor" title="Gamma [Default: 0.7]" min="0" max="1"/>
+            <input type="number" id="exploration-rate-input" placeholder="Exploration Rate" title="Epsilon [Default: 0.1]" min="0" max="1"/>
         </div>
         <div>
-            <input type="number" id="max-steps-input" placeholder="Steps" title="Maximum Steps"/>
-            <input type="number" id="step-speed-input" placeholder="Speed" title="In Millisecond"/>
+            <input type="number" id="max-steps-input" placeholder="Steps" title="Maximum Steps [Default: 200]" min="0"/>
+            <input type="number" id="step-speed-input" placeholder="Speed" title="Speed (in millisecond) [Default: 1000]" min="10"/>
         </div>
         <div>
-            <input type="text" id="init-state-input" placeholder="Initial State" title="x, y"/>
+            <input type="text" id="init-state-input" placeholder="Initial State" title="Initial State: x, y [Default: Random]"/>
+            <select id="game-policies" title="Policy [Default: Q-learning]">Policy</select>
         </div>
-        <button id="start-button">Start</button>
+        <div>
+            <button id="start-button">Start</button>
+        </div>
     </div>
     <div class="container">
         <table>
@@ -44,17 +55,17 @@
     <div class="game-values" id="game-values" title="Click to hide!">
         <div class="game-board-row">
             <div class="game-value"></div>
-            <div class="game-value" id="action-left-value" title="Left"></div>
+            <div class="game-value" id="action-left-value" title="State-Action Value for action [Left]"></div>
             <div class="game-value"></div>
         </div>
         <div class="game-board-row">
-            <div class="game-value" id="action-up-value" title="Up"></div>
+            <div class="game-value" id="action-up-value" title="State-Action Value for action [Up]"></div>
             <div class="game-value"></div>
-            <div class="game-value" id="action-down-value" title="Down"></div>
+            <div class="game-value" id="action-down-value" title="State-Action Value for action [Down]"></div>
         </div>
         <div class="game-board-row">
             <div class="game-value"></div>
-            <div class="game-value" id="action-right-value" title="Right"></div>
+            <div class="game-value" id="action-right-value" title="State-Action Value for action [Right]"></div>
             <div class="game-value"></div>
         </div>
     </div>

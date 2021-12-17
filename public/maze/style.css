@@ -1,21 +1,58 @@
-button {
-    margin-top: 5px;
-    margin-bottom: 5px;
+* {
+    font-family: 'Courier New', Courier, monospace;
+}
+
+/* If the screen size is 601px wide or more, set the font-size of <div> to 80px */
+@media screen and (min-width: 601px) {
+    * {
+        font-size: 30px;
+    }
+}
+  
+/* If the screen size is 600px wide or less, set the font-size of <div> to 30px */
+@media screen and (max-width: 600px) {
+    * {
+        font-size: 20px;
+    }
+}
+
+textarea, button, input, select, option {
+    padding: 0.75em;
+    border: 0.125em solid black;
+}
+
+button, input {
+    margin-top: 0.5em;
+    margin-bottom: 0.5em;
+}
+
+button:hover {
+    background-color: lightgreen;
     cursor: pointer;
 }
 
-input {
-    margin-top: 5px;
-    margin-bottom: 5px;
+input:hover {
+    background-color: lightgreen;
 }
 
-.container {
-    margin: 20px;
+input:invalid {
+    background-color: lightpink;
+}
+
+select {
+    cursor: pointer;
+}
+
+option {
+    background-color: white;
+}
+
+.container, .game-board, .game-reward, .game-action {
+    margin: 0.5em;
 }
 
 .game-board {
     display: inline-block;
-    margin: 20px;
 }
 
 .game-board-row {
@@ -24,24 +61,12 @@ input {
 
 .game-state {
     display: inline-block;
-    width: 32px;
-    height: 32px;
     cursor: pointer;
-}
-
-.game-reward {
-    margin: 20px;
-}
-
-.game-action {
-    margin: 20px;
 }
 
 .game-values {
     display: flex;
     position: absolute;
-    width: 96px;
-    height: 96px;
     background-color: rgba(0, 0, 0, 0.5);
     visibility: hidden;
     cursor: pointer;
@@ -49,10 +74,22 @@ input {
 
 .game-value {
     display: inline-block;
-    width: 32px;
-    height: 32px;
     color: yellow;
     cursor: pointer;
     text-align: center;
     overflow-x: hidden;
+}
+
+.game-value:hover {
+    overflow-x: visible;
+}
+
+.game-state, .game-value {
+    width: 2em;
+    height: 2em;
+}
+
+.game-values {
+    width: 6em;
+    height: 6em;
 }

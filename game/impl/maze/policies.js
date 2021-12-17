@@ -100,9 +100,6 @@ class TDPolicy extends Policy {
         this.learningRate = config?.learningRate; // alpha in (0, 1]
         this.discountFactor = config?.discountFactor; // gamma in [0, 1]
         this.explorationRate = config?.explorationRate; // epsilon in [0, 1)
-        if (this.learningRate === undefined || this.discountFactor === undefined) {
-            throw new UnknownValueError(this.config);
-        }
         this.setValues(undefined); // v/q: overriding needed
         this.visitedStates = new StateSet(); // contains visited states
     }

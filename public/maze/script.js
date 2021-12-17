@@ -6,7 +6,7 @@ console.log('Your contribution is always welcome!');
 let debug = false; // change it as `true` to see the logs
 
 const startButton = document.getElementById('start-button');
-const mapModifyButton = document.getElementById('map-modify-button');
+const mapReloadButton = document.getElementById('map-reload-button');
 const mapInput = document.getElementById('map');
 const stepSpeedInput = document.getElementById('step-speed-input');
 const learningRateInput = document.getElementById('learning-rate-input');
@@ -14,6 +14,7 @@ const discountFactorInput = document.getElementById('discount-factor-input');
 const explorationRateInput = document.getElementById('exploration-rate-input');
 const maxStepsInput = document.getElementById('max-steps-input');
 const initStateInput = document.getElementById('init-state-input');
+const gamePolicyMenu = document.getElementById('game-policies');
 const gameStatesContainer = document.getElementById('game-states');
 const totalRewardSpanner = document.getElementById('total-reward');
 const nextActionSpanner = document.getElementById('next-action');
@@ -26,23 +27,35 @@ const actionDownValueSpanner = document.getElementById('action-down-value');
 
 function createGameState(state) {
     const gameState = document.createElement('div');
-    gameState.title = `[${state.x}, ${state.y}]`;
+    gameState.title = `\nState: ${state.x}, ${state.y}`;
     gameState.className = 'game-state';
+    let reward;
     if (state.description === 'W') {
+        reward = -5;
         gameState.style.backgroundColor = 'black';
+        gameState.title += `\t[WALL]`;
     }
     else if (state.description === 'G') {
+        reward = +10;
         gameState.style.backgroundColor = 'green';
+        gameState.title += `\t[GOAL]`;
     }
     else {
-        gameState.style.backgroundColor = 'gray';
+        reward = Number(state.description);
+        let backgroundColor = 'gray';
+        if (Number.isNaN(reward)) reward = 0;
+        if (reward > 0) backgroundColor = 'lightgreen';
+        else if (reward < 0) backgroundColor = 'lightpink';
+        gameState.style.backgroundColor = backgroundColor;
+        gameState.onmouseleave = function () {
+            gameState.style.backgroundColor = backgroundColor;
+        };
         gameState.onmouseover = function () {
             gameState.style.backgroundColor = 'white';
         };
-        gameState.onmouseleave = function () {
-            gameState.style.backgroundColor = 'gray';
-        };
     }
+    gameState.title += `\nReward: ${reward < 0 ? '-' : '+'}${Math.abs(reward)}\n`;
+    gameState.title += '\nClick to view State-Action Values!';
     return gameState;
 }
 
@@ -55,10 +68,15 @@ function setGameValues(state, policyValues) {
     };
     for (const values of policyValues) {
         if (values[0].state.x === state.x && values[0].state.y === state.y) {
-            if (values[0].action === 'UP') gameValues.up = values[1];
-            else if (values[0].action === 'LEFT') gameValues.left = values[1];
-            else if (values[0].action === 'RIGHT') gameValues.right = values[1];
-            else if (values[0].action === 'DOWN') gameValues.down = values[1];
+            let gameValue;
+            if (!Number.isNaN(values[1])) {
+                gameValue = Number(values[1]);
+                gameValue = Math.round(gameValue * 100) / 100; // takes 2 digits after floating point
+            }
+            if (values[0].action === 'UP') gameValues.up = gameValue;
+            else if (values[0].action === 'LEFT') gameValues.left = gameValue;
+            else if (values[0].action === 'RIGHT') gameValues.right = gameValue;
+            else if (values[0].action === 'DOWN') gameValues.down = gameValue;
         }
         if (gameValues.up !== undefined && gameValues.left !== undefined) {
             if (gameValues.right !== undefined && gameValues.down !== undefined) {
@@ -100,6 +118,24 @@ function visualizeGameStates(states, currentState, policyValues) {
     }
 }
 
+function addGamePolicy(index, title) {
+    const gamePolicy = document.createElement('option');
+    gamePolicy.className = 'game-policy';
+    gamePolicy.innerText = title;
+    gamePolicy.title = `\n${title}\t[Index: ${index}]`;
+    gamePolicy.value = index;
+    gamePolicyMenu.appendChild(gamePolicy);
+}
+
+function addGamePolicies(policies) {
+    gamePolicyMenu.innerHTML = ''; // remove all child nodes
+    if (policies !== undefined) {
+        for (let index = 0; index < policies.length; index++) {
+            addGamePolicy(index, policies[index].title);
+        }
+    }
+}
+
 
 
 const that = io();
@@ -121,6 +157,7 @@ function init() {
         mapInput.value = gameInfo.environment.instance.text;
         states = gameInfo.environment.states;
         if (debug) console.log(gameInfo);
+        addGamePolicies(gameInfo.policies);
         visualizeGameStates(states);
         if (debug) console.log('game fetched');
     });
@@ -142,6 +179,7 @@ function init() {
     that.on('map-changed', function (gameInfo) {
         states = gameInfo.environment.states;
         if (debug) console.log(gameInfo);
+        addGamePolicies(gameInfo.policies);
         visualizeGameStates(states);
         if (debug) console.log('map changed');
     })
@@ -149,8 +187,15 @@ function init() {
 
 function start() {
     const initState = initStateInput.value.split(',');
+    let policyOption;
+    for (const gamePolicy of gamePolicyMenu.childNodes) {
+        if (gamePolicy.selected) {
+            policyOption = gamePolicy;
+            break;
+        }
+    }
     that.emit('start-game', {
-        policyNumber: 1, // Q-learning
+        policyNumber: policyOption.value || 1, // Q-learning
         maxSteps: maxStepsInput.value || 200,
         learningRate: learningRateInput.value || 0.5,
         discountFactor: discountFactorInput.value || 0.7,
@@ -177,7 +222,7 @@ function stop() {
     if (debug) console.log('game stopped');
 }
 
-function modify() {
+function reloadMap() {
     const mapText = mapInput.value.replaceAll('\n', '\r\n').toUpperCase();
     localStorage.setItem('map', mapText);
     if (debug) console.log('map saved in local storage');
@@ -191,8 +236,8 @@ startButton.onclick = function () {
     else stop();
 };
 
-mapModifyButton.onclick = function () {
-    modify();
+mapReloadButton.onclick = function () {
+    reloadMap();
 }
 
 gameValuesPopup.onclick = function () {

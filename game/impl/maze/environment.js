@@ -35,14 +35,20 @@ class Maze extends Environment {
     initializeMazeFromText(text) {
         const maze = [];
         const lines = text.split('\r\n');
+        let maxWidth = 0;
         for (const line of lines) {
             const row = [];
             const values = line.split(' ');
             for (const value of values) {
-                row.push(value);
+                row.push(value?.trim().toUpperCase());
             }
             maze.push(row);
+            if (row.length > maxWidth) {
+                maxWidth = row.length;
+            }
         }
+        this.width = maxWidth;
+        this.height = maze.length;
         this.initializeMaze(maze);
     }
 
@@ -58,15 +64,15 @@ class Maze extends Environment {
     }
 
     initializeStates(maze) {
-        this.height = maze.length;
-        if (!this.height) throw new UnknownValueError(this.height);
-        this.width = maze[0].length;
-        if (!this.width) throw new UnknownValueError(this.width);
         this.states = [];
         for (let x = 0; x < this.height; x++) {
             const row = [];
             for (let y = 0; y < this.width; y++) {
-                row.push(new MazeState(x, y, maze[x][y]));
+                let description = MazeState.WALL;
+                if (maze[x][y] !== undefined) {
+                    description = maze[x][y];
+                }
+                row.push(new MazeState(x, y, description));
             }
             this.states.push(row);
         }
@@ -77,18 +83,20 @@ class Maze extends Environment {
         for (let x = 0; x < this.height; x++) {
             const row = [];
             for (let y = 0; y < this.width; y++) {
-                let reward = 0;
                 const state = this.states[x][y];
-                switch (state.description) {
-                    case MazeState.OTHER:
-                        reward = +0;
-                        break;
-                    case MazeState.WALL:
-                        reward = -5;
-                        break;
-                    case MazeState.GOAL:
-                        reward = +10;
-                        break;
+                let reward = Number(state.description);
+                if (Number.isNaN(reward)) {
+                    switch (state.description) {
+                        case MazeState.OTHER:
+                            reward = +0;
+                            break;
+                        case MazeState.WALL:
+                            reward = -5;
+                            break;
+                        case MazeState.GOAL:
+                            reward = +10;
+                            break;
+                    }
                 }
                 row.push({
                     state: state,
