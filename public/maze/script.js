@@ -148,6 +148,7 @@ let debug = false; // change it as `true` to see the logs
         addGamePolicies(gameInfo.policies);
         visualizeGameStates(states);
         if (debug) console.log('map changed');
+        return states;
     }
     
     function init() {
@@ -163,8 +164,8 @@ let debug = false; // change it as `true` to see the logs
             }
         });
     
-        that.on('game-fetched', (gameInfo) => updateMap(gameInfo));
-        that.on('map-changed', (gameInfo) => updateMap(gameInfo));
+        that.on('game-fetched', (gameInfo) => states = updateMap(gameInfo));
+        that.on('map-changed', (gameInfo) => states = updateMap(gameInfo));
     
         that.on('game-step-fetched', function (gameStepInfo) {
             const currentState = gameStepInfo.gameStep.state;
