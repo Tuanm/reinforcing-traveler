@@ -31,6 +31,10 @@ button:hover {
     cursor: pointer;
 }
 
+input {
+    width: 400px;
+}
+
 input:hover {
     background-color: lightgreen;
 }
@@ -41,10 +45,6 @@ input:invalid {
 
 select {
     cursor: pointer;
-}
-
-option {
-    background-color: white;
 }
 
 .container, .game-board, .game-reward, .game-action {

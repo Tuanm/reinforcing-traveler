@@ -4,19 +4,15 @@
 </head>
 <body>
     <div class="container">
-        <h1>A-maze game</h1>
+        <h1>A-maze game!</h1>
+        <em>A simple implementation for Temporal Difference Learning.</em>
     </div>
     <div class="container">
         <div>
             <textarea id="map" cols="40" rows="10" placeholder="The maze will be changed here..."></textarea>
         </div>
         <div>
-            <textarea cols="40" rows="5" title="Available Symbols" readonly>
-                W = WALL [-5]
-                G = GOAL [+10]
-                - = OTHER [+0]
-                number = OTHER [number]
-            </textarea>
+            <textarea id="map-help" cols="40" rows="5" title="Available Symbols" readonly hidden></textarea>
         </div>
         <button id="map-reload-button">Reload</button>
     </div>
@@ -68,6 +64,9 @@
             <div class="game-value" id="action-right-value" title="State-Action Value for action [Right]"></div>
             <div class="game-value"></div>
         </div>
+    </div>
+    <div class="container">
+        <div>Follow me on <a href="http://github.com/Tuanm">GitHub</a>!</div>
     </div>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/3.1.3/socket.io.min.js"></script>
     <script src="/maze/script.js"></script>

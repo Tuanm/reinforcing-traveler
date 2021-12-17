@@ -9,6 +9,7 @@ let debug = false; // change it as `true` to see the logs
     const startButton = document.getElementById('start-button');
     const mapReloadButton = document.getElementById('map-reload-button');
     const mapInput = document.getElementById('map');
+    const mapHelper = document.getElementById('map-help');
     const stepSpeedInput = document.getElementById('step-speed-input');
     const learningRateInput = document.getElementById('learning-rate-input');
     const discountFactorInput = document.getElementById('discount-factor-input');
@@ -232,6 +233,15 @@ let debug = false; // change it as `true` to see the logs
         if (debug) console.log('map saved in local storage');
         that.emit('change-map', mapText);
     }
+    
+    function loadHelper() {
+        mapHelper.value = '';
+        mapHelper.value += 'W      = WALL [-5]\r\n';
+        mapHelper.value += 'G      = GOAL [+10]\r\n';
+        mapHelper.value += '-      = OTHER [+0]\r\n';
+        mapHelper.value += 'number = OTHER [number]\r\n';
+        mapHelper.hidden = false;
+    }
 
     startButton.onclick = function () {
         if (!that.running) start();
@@ -240,13 +250,13 @@ let debug = false; // change it as `true` to see the logs
 
     mapReloadButton.onclick = function () {
         reloadMap();
+        loadHelper();
     }
 
     gameValuesPopup.onclick = function () {
         gameValuesPopup.style.visibility = 'hidden';
     };
 
-    window.onbeforeunload = close;
     window.onload = init;
 })();
 
