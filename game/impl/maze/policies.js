@@ -134,7 +134,8 @@ class TDPolicy extends Policy {
     }
 
     isValid(nextState) {
-        return nextState?.description !== MazeState.WALL;
+        if (nextState === undefined) return false;
+        return nextState.description !== MazeState.WALL;
     }
 }
 
@@ -199,7 +200,7 @@ class OneStepTDPolicy extends TDPolicy {
             this.values.set(state, currentStateValue + this.learningRate * tdError);
         }
         return this.takeActionByPolicy(
-            this.isValid(nextState) ? state : nextState
+            this.isValid(nextState) ? nextState : state
         );
     }
 }
@@ -222,7 +223,7 @@ class SARSAPolicy extends TDPolicy {
         const explorationAction = this.tryExplore(nextState);
         if (explorationAction !== undefined) return explorationAction;
 
-        let maxValue = this.values.defaultValue;
+        let maxValue = -Infinity;
         for (const stateActionPair of this.values.keys()) {
             if (stateActionPair.state.equals(nextState)) {
                 if (this.values.get(stateActionPair) >= maxValue) {
@@ -245,7 +246,7 @@ class SARSAPolicy extends TDPolicy {
 
     dicide(state, action, reward, nextState) { // return an action
         const nextAction = this.takeActionByPolicy(
-            this.isValid(nextState) ? state : nextState
+            this.isValid(nextState) ? nextState : state
         );
         if (state !== undefined && reward !== undefined) {
             if (!this.visitedStates.has(state)) {
@@ -327,7 +328,7 @@ class QLearningPolicy extends TDPolicy {
             ));
         }
         return this.takeActionByPolicy(
-            this.isValid(nextState) ? state : nextState
+            this.isValid(nextState) ? nextState : state
         );
     }
 }

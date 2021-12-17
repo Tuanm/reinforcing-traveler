@@ -116,7 +116,6 @@ function setSocketServer(httpServer) {
             const finalGameStepInfo = {
                 gameStep: {
                     state: result.states[result.states.length - 1],
-                    action: result.actions[result.actions.length - 1],
                     reward: result.rewards[result.rewards.length - 1],
                     totalReward: result.totalReward
                 },
