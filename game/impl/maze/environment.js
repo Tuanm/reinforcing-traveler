@@ -137,7 +137,7 @@ class Maze extends Environment {
             const x = Math.floor(Math.random() * this.height);
             const y = Math.floor(Math.random() * this.width);
             const state = this.states[x][y];
-            if (state.description === MazeState.OTHER) return state;
+            if (state.description !== MazeState.WALL) return state;
         }
     }
 
