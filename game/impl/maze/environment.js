@@ -30,6 +30,7 @@ class Maze extends Environment {
         super();
         this.initializeMazeFromText(text);
         this.text = text;
+        this.futureHandlers = []; // for handling some shits
     }
 
     initializeMazeFromText(text) {
@@ -120,7 +121,13 @@ class Maze extends Environment {
         return goalStates;
     }
 
+    handleVisitedStates() {
+        for (const handler of this.futureHandlers) handler();
+        while (this.futureHandlers.length > 0) this.futureHandlers.pop(); // clear tasks
+    }
+
     response(state, action) {
+        this.handleVisitedStates();
         const newState = this.getNextState(state, action);
         const reward = this.getReward(newState);
         if (newState.description === MazeState.GOAL) {
@@ -130,6 +137,10 @@ class Maze extends Environment {
             nextState: newState,
             reward: reward
         };
+    }
+
+    reset() {
+        this.initializeMazeFromText(this.text);
     }
 
     getRandomState() {
@@ -174,7 +185,16 @@ class Maze extends Environment {
     }
 
     getReward(newState) {
-        return this.rewards[newState.x][newState.y]?.reward;
+        const reward = this.rewards[newState.x][newState.y]?.reward;
+        if (reward !== undefined && reward > 0) {
+            if (newState.description !== MazeState.GOAL) {
+                this.futureHandlers.push(() => {
+                    this.states[newState.x][newState.y].description = MazeState.OTHER;
+                    this.rewards[newState.x][newState.y].reward = 0; // reset positive reward
+                });
+            }
+        }
+        return reward;
     }
 }
 

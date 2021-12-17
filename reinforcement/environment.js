@@ -26,4 +26,8 @@ export default class Environment {
     getRandomState() {
         throw new NotImplementedError(this.getRandomState); // must return a random state
     }
+
+    reset() {
+        throw new NotImplementedError(this.reset); // reset environment's states. etc.
+    }
 }

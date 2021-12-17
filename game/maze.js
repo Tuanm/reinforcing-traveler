@@ -93,6 +93,7 @@ function setSocketServer(httpServer) {
             const environment = game.environment.instance;
             const agent = game.agent;
             const policy = game.policies[settings.policyNumber].instance;
+            environment.reset(); // reset to original states
             policy.learningRate = settings.learningRate;
             policy.discountFactor = settings.discountFactor;
             policy.explorationRate = settings.explorationRate;
@@ -102,7 +103,8 @@ function setSocketServer(httpServer) {
             const result = await agent.run(undefined, async (gameStep) => {
                 socket.emit('game-step-fetched', {
                     gameStep: gameStep,
-                    policyValues: policy.getValues()
+                    policyValues: policy.getValues(),
+                    environmentStates: environment.states
                 });
                 await sleep(settings.stepSpeed);
                 if (socket.disconnected) {
@@ -120,6 +122,7 @@ function setSocketServer(httpServer) {
                     totalReward: result.totalReward
                 },
                 policyValues: policy.getValues(),
+                environmentStates: environment.states,
                 gameFinished: true
             };
             socket.emit('game-step-fetched', finalGameStepInfo);

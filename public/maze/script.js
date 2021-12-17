@@ -24,8 +24,8 @@ let debug = false; // change it as `true` to see the logs
     const actionLeftValueSpanner = document.getElementById('action-left-value');
     const actionRightValueSpanner = document.getElementById('action-right-value');
     const actionDownValueSpanner = document.getElementById('action-down-value');
-    
-    
+
+
     function createGameState(state) {
         const gameState = document.createElement('div');
         gameState.title = `\nState: ${state.x}, ${state.y}`;
@@ -59,7 +59,7 @@ let debug = false; // change it as `true` to see the logs
         gameState.title += '\nClick to view State-Action Values!';
         return gameState;
     }
-    
+
     function setGameValues(state, policyValues) {
         const gameValues = {
             up: undefined,
@@ -90,7 +90,7 @@ let debug = false; // change it as `true` to see the logs
         actionRightValueSpanner.innerText = gameValues.right !== undefined ? gameValues.right : '';
         actionDownValueSpanner.innerText = gameValues.down !== undefined ? gameValues.down : '';
     }
-    
+
     function peekGameStateValues(state, policyValues) {
         if (state === undefined || policyValues === undefined) return;
         setGameValues(state, policyValues);
@@ -99,7 +99,7 @@ let debug = false; // change it as `true` to see the logs
         gameValuesPopup.style.left = gameState.offsetLeft - gameState.offsetWidth;
         gameValuesPopup.style.visibility = 'visible';
     }
-    
+
     function visualizeGameStates(states, currentState, policyValues) {
         gameStatesContainer.innerHTML = ''; // remove all child nodes
         for (const stateRow of states) {
@@ -118,7 +118,7 @@ let debug = false; // change it as `true` to see the logs
             gameStatesContainer.appendChild(gameBoardRow);
         }
     }
-    
+
     function addGamePolicy(index, title) {
         const gamePolicy = document.createElement('option');
         gamePolicy.className = 'game-policy';
@@ -127,7 +127,7 @@ let debug = false; // change it as `true` to see the logs
         gamePolicy.value = index;
         gamePolicyMenu.appendChild(gamePolicy);
     }
-    
+
     function addGamePolicies(policies) {
         gamePolicyMenu.innerHTML = ''; // remove all child nodes
         if (policies !== undefined) {
@@ -136,24 +136,20 @@ let debug = false; // change it as `true` to see the logs
             }
         }
     }
-    
-    
+
+
     // socket client
     const that = io();
 
     function updateMap(gameInfo) {
         mapInput.value = gameInfo.environment.instance.text;
-        const states = gameInfo.environment.states;
         if (debug) console.log(gameInfo);
         addGamePolicies(gameInfo.policies);
-        visualizeGameStates(states);
+        visualizeGameStates(gameInfo.environment.states);
         if (debug) console.log('map changed');
-        return states;
     }
-    
+
     function init() {
-        let states;
-    
         that.on('connected', function () {
             const mapText = localStorage.getItem('map');
             if (!mapText) {
@@ -163,13 +159,14 @@ let debug = false; // change it as `true` to see the logs
                 that.emit('change-map', mapText);
             }
         });
-    
-        that.on('game-fetched', (gameInfo) => states = updateMap(gameInfo));
-        that.on('map-changed', (gameInfo) => states = updateMap(gameInfo));
-    
+
+        that.on('game-fetched', (gameInfo) => updateMap(gameInfo));
+        that.on('map-changed', (gameInfo) => updateMap(gameInfo));
+
         that.on('game-step-fetched', function (gameStepInfo) {
             const currentState = gameStepInfo.gameStep.state;
             const policyValues = gameStepInfo.policyValues;
+            const states = gameStepInfo.environmentStates;
             visualizeGameStates(states, currentState, policyValues);
             nextActionSpanner.textContent = gameStepInfo.gameStep.action;
             totalRewardSpanner.textContent = gameStepInfo.gameStep.totalReward;
@@ -181,11 +178,11 @@ let debug = false; // change it as `true` to see the logs
             }
         });
     }
-    
+
     function close() {
         that.close();
     }
-    
+
     function start() {
         const initState = initStateInput.value.split(',');
         let policyOption;
@@ -217,34 +214,34 @@ let debug = false; // change it as `true` to see the logs
         updateStartButton();
         if (debug) console.log('game started');
     }
-    
+
     function updateStartButton() {
         startButton.textContent = !that.running ? 'Start' : 'Stop';
     }
-    
+
     function stop() {
         that.emit('stop-game');
         that.running = false;
         updateStartButton();
         if (debug) console.log('game stopped');
     }
-    
+
     function reloadMap() {
         const mapText = mapInput.value.replaceAll('\n', '\r\n').toUpperCase();
         localStorage.setItem('map', mapText);
         if (debug) console.log('map saved in local storage');
         that.emit('change-map', mapText);
     }
-    
+
     startButton.onclick = function () {
         if (!that.running) start();
         else stop();
     };
-    
+
     mapReloadButton.onclick = function () {
         reloadMap();
     }
-    
+
     gameValuesPopup.onclick = function () {
         gameValuesPopup.style.visibility = 'hidden';
     };
